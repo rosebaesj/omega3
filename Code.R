@@ -6,34 +6,39 @@ library(data.table)
 library(dplyr)
 library(tidyverse)
 
-setwd("/Users/jorickbater/Downloads")
-
+#setwd("/Users/jorickbater/Downloads")
+getwd()
 ### Pre-processing steps 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ########################## (1) metadata ###############################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 ###################### read in channing metadata ###############################
 
 #Exposure Data
-source("/Users/jorickbater/Desktop/Mingyang Stuff/Data/Rstart.R")
-z_mlvs_exposure_new <- read.table('./mlvs_exposure_for_jorick.txt', header=TRUE, sep='\t', check.names=TRUE, quote ="")
+source("noGit/Rstart.R")
+z_mlvs_exposure_new <- read.table("noGit/mlvs_exposure_sunjeong.txt", 
+                                  header=TRUE, sep='\t', check.names=TRUE, quote ="")
 #z_mlvs_exposure_new <- merge(totom,z_mlvs_exposure_new,by="id")
 
-z_idkey <- read.csv('/Users/jorickbater/Desktop/Mingyang Stuff/Data/idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
+z_idkey <- read.csv('noGit/idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
 rownames(z_idkey) <- z_idkey$id
 z_idkey <- z_idkey[order(z_idkey$id), ] 
 
 z_mlvs_exposure <- reassignKey(z_mlvs_exposure_new)
 
-colnames(z_mlvs_exposure) <- gsub("w1avg","w1", colnames(z_mlvs_exposure))
+#gsub search and replace in files -> ~~_w1avg colnames changed to ~~_w1, etc.
+colnames(z_mlvs_exposure) <- gsub("w1avg","w1", colnames(z_mlvs_exposure)) 
 colnames(z_mlvs_exposure) <- gsub("w2avg","w2", colnames(z_mlvs_exposure))
-
 colnames(z_mlvs_exposure) <- gsub("plasma1","w1", colnames(z_mlvs_exposure))
 colnames(z_mlvs_exposure) <- gsub("plasma2","w2", colnames(z_mlvs_exposure))
 
 z_mlvs_agebmi <- z_mlvs_exposure [ , colnames(z_mlvs_exposure) %in% c('agemlvs', 'bmi12','act10','id')] 
+#id is actually rownames
 
+
+####****not working. don't have ala10v etc. as colnames****
 keep_metadata_cum <- c('ala10v','epa10v','dha10v','dpa10v','calor10v', 'trans10v', 'omega610v', 'omega310v', 'omega3_noala10v')
 z_metadata_cum <- z_mlvs_exposure[, keep_metadata_cum]
 
