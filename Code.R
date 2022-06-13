@@ -18,7 +18,7 @@ getwd()
 
 #Exposure Data
 source("noGit/Rstart.R")
-z_mlvs_exposure_new <- read.table("noGit/mlvs_exposure_sunjeong.txt", 
+z_mlvs_exposure_new <- read.table("noGit/mlvs_exposure_for_jorick.txt", 
                                   header=TRUE, sep='\t', check.names=TRUE, quote ="")
 #z_mlvs_exposure_new <- merge(totom,z_mlvs_exposure_new,by="id")
 
@@ -104,7 +104,7 @@ energyfiber_w2 <- c('calor_fs_dr_w2', 'a_omega3_fs_dr_w2', 'a_omega3_noala_fs_dr
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # bring in legacy file - just for checking, I actually used species data in Channing
 #library(dplyr)
-all_species <- read_tsv("metaphlan_taxonomic_profiles.tsv")
+all_species <- read_tsv("noGit/metaphlan_taxonomic_profiles.tsv")
 names(all_species)[names(all_species) == '# taxonomy'] <- 'Sample'
 
 all_species <- all_species %>% 
@@ -112,7 +112,7 @@ all_species <- all_species %>%
             .funs = funs(sub("[_]dna_taxonomic_profile", "", .)))
 
 all_species <-all_species %>%
-  separate(Sample, c("kingdom",       "phylum",        "class" ,        "order",         "family",        "genus" ,        "species" ), 
+  separate(Sample, c("kingdom","phylum","class" ,"order","family","genus" ,"species" ), 
            sep = '\\|', remove = TRUE)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
@@ -134,6 +134,7 @@ all_species <- as.data.frame(all_species1)
 
 dim(all_species)
 # [1] 468 929
+# sunjeong: [1] 543 929
 
 all_sample <- colnames(all_species)
 #View(all_sample)
@@ -142,13 +143,19 @@ all_sample <- colnames(all_species)
 all_species <- all_species[ , !colnames(all_species) %in% c(grep("15074981", colnames(all_species), value = T))]
 dim(all_species)
 # [1] 468 925
+# sunjeong: [1] 543 925
 #colSums(all_species)
 
 # generate list of species after abundance/prevalence filtering
 # since this file is scaled to 100, i am keeping bugs with >10% prevalence and 0.01 abundance (i.e. .0001*100 when relab is scaled 0-1 and not 0-100)
 dim(all_species[apply(all_species, 1, function(bug) sum(bug >= 0.01) >= 0.1*ncol(all_species)), ])
 # [1] 139 925 = the 139 species after QC included in initial starr manuscripts
+# sunjeong: [1] 156 925
 all_species_filt <- all_species[ apply(all_species, 1, function(bug) sum(bug >= 0.01) >= 0.1*ncol(all_species)), ]
+
+
+
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
