@@ -162,8 +162,10 @@ outlier: Q3+1.5IQR=2.75162+1.5*1.085002=4.379123
 Q3+3IQR=2.75162+3*1.085002=6.006626
 
 #### drop observations with short-term fiber >Q3+1.5IQR
+~~~~~~~~~~~~r~~~~~~~~~~~~
 a_omega3_fs_ddr_1.5IQR <- a_omega3_fs_ddr[a_omega3_fs_ddr$a_omega3_fs_dr<=4.379123,]
 a_omega3_fs_ddr_3IQR <- a_omega3_fs_ddr[a_omega3_fs_ddr$a_omega3_fs_fs_dr<=6.006626,]
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## what is this
 ~~~~~~~~~~~~r~~~~~~~~~~~~
@@ -172,3 +174,47 @@ mlvs_metadata_925 <- z_w12.all_species.all[,!colnames(z_w12.all_species.all) %in
 ```diff
 - what dose this mean?
 ```
+
+# making .pcl files
+To make sets that I can import whenever needed
+```diff
+- what is .pcl?
+Printer Command Language (PCL) vector format
+allow computers and printers to communicate with each other
+```
+~~~~~~~~~~~~r~~~~~~~~~~~~
+for(i in 1:ncol(species_all)) { 
+  species_all[ , i] <- as.numeric(as.character(species_all[, i])) 
+}
+
+pcl_file <- c('species_all', 
+              'ala_ffqcum','epa_ffqcum','dha_ffqcum', 'dpa_ffqcum', 'trans_ffqcum', 'omega6_ffqcum', 'omega3_ffqcum', 'omega3_noala_ffqcum',
+              'ala_avg_fs_ffq', 'epa_avg_fs_ffq', 'dha_avg_fs_ffq', 'dpa_avg_fs_ffq', 'trans_avg_fs_ffq', 'omega6_avg_fs_ffq', 'omega3_avg_fs_ffq', 'omega3_noala_avg_fs_ffq',
+              'a_omega3_fs_ddr', 'a_omega3_fs_ddr_complete', 'a_omega3_fs_ddr_1.5IQR', 'a_omega3_fs_ddr_3IQR', 'a_omega3_noala_fs_ddr', 'a_ala_fs_ddr', 'a_trans_fs_ddr', 'a_epa_fs_ddr', 'a_dha_fs_ddr', 'a_dpa_fs_ddr',
+              'omega3_tfat_ddr', 'trans_tfat_ddr', 'epa_tfat_ddr', 'dha_tfat_ddr', 'dpa_tfat_ddr',
+              'biomarker_logcrp', 'biomarker_logcrp_complete', 'a_omega3_fs_ddr_logcrp', 'biomarker_loghdl', 'biomarker_loghdl_complete', 'a_omega3_fs_ddr_loghdl', 'biomarker_logtg', 'biomarker_logtg_complete', 'a_omega3_fs_ddr_logtg',
+              'a_omega3_noala_fs_ddr_logcrp', 'a_omega3_noala_fs_ddr_loghdl', 'a_omega3_noala_fs_ddr_logtg',
+              'a_trans_fs_ddr_logcrp', 'a_trans_fs_ddr_loghdl', 'a_trans_fs_ddr_logtg',
+              'a_ala_fs_ddr_logcrp', 'a_ala_fs_ddr_loghdl', 'a_ala_fs_ddr_logtg',
+              'a_epa_fs_ddr_logcrp', 'a_epa_fs_ddr_loghdl', 'a_epa_fs_ddr_logtg',
+              'a_dha_fs_ddr_logcrp', 'a_dha_fs_ddr_loghdl', 'a_dha_fs_ddr_logtg',
+              'a_dpa_fs_ddr_logcrp', 'a_dpa_fs_ddr_loghdl', 'a_dpa_fs_ddr_logtg',
+              'z_metadata_all','mlvs_metadata_925')   
+~~~~~~~~~~~~~~~~~~~~~~~~
+make pcl files 
+~~~~~~~~~~~~r~~~~~~~~~~~~
+for (a in 1:length(pcl_file)){
+  tempdf <- NULL
+  # transpose
+  tempdf <- as.data.frame ( t (get( pcl_file[a] ) ) )
+  # steps to add the word sample to cell [1,1] so maaslin won't throw an error 
+  tempcol <- colnames(tempdf)
+  tempdf$sample = row.names(tempdf)
+  addsamp = c('sample', tempcol)
+  foo = tempdf [ , addsamp]
+  # write table
+  write.table(foo, paste('./noGit/maaslin2/pcl/', pcl_file[a], '.pcl',sep=''),  sep = '\t', quote = F, eol = '\n',  row.names=F)
+}   
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+
