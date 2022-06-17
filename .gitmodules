@@ -1,0 +1,3 @@
+[submodule "omega3_file"]
+	path = omega3_file
+	url = https://github.com/rosebaesj/omega3_file.git
