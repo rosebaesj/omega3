@@ -26,8 +26,20 @@ z_mlvs_exposure_new <- read.table("noGit/mlvs_exposure_for_jorick.txt",
 z_idkey <- read.csv('noGit/idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
 rownames(z_idkey) <- z_idkey$id
 z_idkey <- z_idkey[order(z_idkey$id), ] 
-
 z_mlvs_exposure <- reassignKey(z_mlvs_exposure_new)
+
+z_plasma <- read.table("noGit/plasma_fatty_acids_sjbae.txt",
+                              header=TRUE, sep='\t', check.names=TRUE, quote ="")
+z_plasma$ID1 <- as.integer(substr(z_plasma$ID, 1, 6))
+
+pp <- left_join(z_plasma, z_idkey, by = "ID1")
+pp <- pp[c("ID", "ID1", "id")]
+ppp <- left_join (z_mlvs_exposure_new, pp, by = "id")
+pppp <- _join(pp, z_mlvs_exposure_new, by = "id")
+write.table(pp, file = "noGit/matching_plasma_id.tsv", sep = "\t", col.names = TRUE, row.names = FALSE)
+sum(is.na(pp$id))
+sum(is.na(ppp$ID1))
+sum(is.na(pppp$))
 
 #gsub search and replace in files -> ~~_w1avg colnames changed to ~~_w1, etc.
 colnames(z_mlvs_exposure) <- gsub("w1avg","w1", colnames(z_mlvs_exposure)) 
