@@ -1,0 +1,287 @@
+2022-06-21 19:46:50 INFO::Writing function arguments to log file
+2022-06-21 19:46:50 DEBUG::Function arguments
+2022-06-21 19:46:50 DEBUG::Output folder: ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all/
+2022-06-21 19:46:50 DEBUG::Min Abundance: 0.000000
+2022-06-21 19:46:50 DEBUG::Min Prevalence: 0.000000
+2022-06-21 19:46:50 DEBUG::Normalization: NONE
+2022-06-21 19:46:50 DEBUG::Transform: AST
+2022-06-21 19:46:50 DEBUG::Analysis method: LM
+2022-06-21 19:46:50 DEBUG::Max significance: 0.250000
+2022-06-21 19:46:50 DEBUG::Random effects: participant
+2022-06-21 19:46:50 DEBUG::Fixed effects:
+2022-06-21 19:46:50 DEBUG::Correction method: BH
+2022-06-21 19:46:50 DEBUG::Standardize: FALSE
+2022-06-21 19:46:50 DEBUG::Cores: 1
+2022-06-21 19:46:50 INFO::Verifying options selected are valid
+2022-06-21 19:46:50 INFO::Determining format of input files
+2022-06-21 19:46:50 INFO::Input format is data samples as columns and metadata samples as columns
+2022-06-21 19:46:50 DEBUG::Transformed data and metadata so samples are rows
+2022-06-21 19:46:50 DEBUG::The following samples were found to have features but no metadata. They will be removed. X502110_F011,X502791_F018
+2022-06-21 19:46:50 DEBUG::A total of 923 samples were found in both the data and metadata
+2022-06-21 19:46:50 DEBUG::Reordering data/metadata to use same sample ordering
+2022-06-21 19:46:50 INFO::Formula for random effects: expr ~ (1 | participant)
+2022-06-21 19:46:50 INFO::Formula for fixed effects: expr ~  agemlvs + bmi12 + abx + logcrp
+2022-06-21 19:46:50 INFO::Filter data based on min abundance and min prevalence
+2022-06-21 19:46:50 INFO::Total samples in data: 923
+2022-06-21 19:46:50 INFO::Min samples required with min abundance for a feature not to be filtered: 0.000000
+2022-06-21 19:46:50 INFO::Total filtered features: 0
+2022-06-21 19:46:50 INFO::Filtered feature names from abundance and prevalence filtering:
+2022-06-21 19:46:50 INFO::Total filtered features with variance filtering: 0
+2022-06-21 19:46:50 INFO::Filtered feature names from variance filtering:
+2022-06-21 19:46:50 INFO::Running selected normalization method: NONE
+2022-06-21 19:46:50 INFO::Bypass z-score application to metadata
+2022-06-21 19:46:50 INFO::Running selected transform method: AST
+2022-06-21 19:46:50 INFO::Running selected analysis method: LM
+2022-06-21 19:46:50 INFO::Fitting model to feature number 1, blautia_obeum
+2022-06-21 19:46:51 INFO::Fitting model to feature number 2, dorea_sp_cag_317
+2022-06-21 19:46:51 INFO::Fitting model to feature number 3, dorea_longicatena
+2022-06-21 19:46:51 INFO::Fitting model to feature number 4, blautia_wexlerae
+2022-06-21 19:46:51 INFO::Fitting model to feature number 5, blautia_sp_cag_257
+2022-06-21 19:46:51 INFO::Fitting model to feature number 6, roseburia_faecis
+2022-06-21 19:46:51 INFO::Fitting model to feature number 7, alistipes_inops
+2022-06-21 19:46:51 INFO::Fitting model to feature number 8, dorea_formicigenerans
+2022-06-21 19:46:51 INFO::Fitting model to feature number 9, roseburia_hominis
+2022-06-21 19:46:51 INFO::Fitting model to feature number 10, ruminococcus_gnavus
+2022-06-21 19:46:51 INFO::Fitting model to feature number 11, gemmiger_formicilis
+2022-06-21 19:46:51 INFO::Fitting model to feature number 12, ruminococcus_torques
+2022-06-21 19:46:51 INFO::Fitting model to feature number 13, alistipes_shahii
+2022-06-21 19:46:51 INFO::Fitting model to feature number 14, eubacterium_hallii
+2022-06-21 19:46:51 INFO::Fitting model to feature number 15, coprococcus_comes
+2022-06-21 19:46:52 INFO::Fitting model to feature number 16, coprococcus_catus
+2022-06-21 19:46:52 INFO::Fitting model to feature number 17, roseburia_sp_cag_309
+2022-06-21 19:46:52 INFO::Fitting model to feature number 18, hungatella_hathewayi
+2022-06-21 19:46:52 INFO::Fitting model to feature number 19, roseburia_sp_cag_182
+2022-06-21 19:46:52 INFO::Fitting model to feature number 20, roseburia_sp_cag_303
+2022-06-21 19:46:52 INFO::Fitting model to feature number 21, eubacterium_ramulus
+2022-06-21 19:46:52 INFO::Fitting model to feature number 22, prevotella_copri
+2022-06-21 19:46:52 INFO::Fitting model to feature number 23, lactococcus_lactis
+2022-06-21 19:46:52 INFO::Fitting model to feature number 24, roseburia_sp_cag_471
+2022-06-21 19:46:52 INFO::Fitting model to feature number 25, eubacterium_eligens
+2022-06-21 19:46:52 INFO::Fitting model to feature number 26, dialister_invisus
+2022-06-21 19:46:52 INFO::Fitting model to feature number 27, roseburia_intestinalis
+2022-06-21 19:46:52 INFO::Fitting model to feature number 28, coprococcus_eutactus
+2022-06-21 19:46:52 INFO::Fitting model to feature number 29, bacteroides_dorei
+2022-06-21 19:46:52 INFO::Fitting model to feature number 30, alistipes_putredinis
+2022-06-21 19:46:53 INFO::Fitting model to feature number 31, alistipes_finegoldii
+2022-06-21 19:46:53 INFO::Fitting model to feature number 32, ruminococcus_bromii
+2022-06-21 19:46:53 INFO::Fitting model to feature number 33, eubacterium_sp_cag_38
+2022-06-21 19:46:53 INFO::Fitting model to feature number 34, clostridium_sp_cag_58
+2022-06-21 19:46:53 INFO::Fitting model to feature number 35, anaerostipes_hadrus
+2022-06-21 19:46:53 INFO::Fitting model to feature number 36, roseburia_inulinivorans
+2022-06-21 19:46:53 INFO::Fitting model to feature number 37, eubacterium_ventriosum
+2022-06-21 19:46:53 INFO::Fitting model to feature number 38, clostridium_sp_cag_299
+2022-06-21 19:46:53 INFO::Fitting model to feature number 39, alistipes_onderdonkii
+2022-06-21 19:46:53 INFO::Fitting model to feature number 40, clostridium_sp_cag_167
+2022-06-21 19:46:53 INFO::Fitting model to feature number 41, bacteroides_ovatus
+2022-06-21 19:46:53 INFO::Fitting model to feature number 42, clostridium_sp_cag_253
+2022-06-21 19:46:53 INFO::Fitting model to feature number 43, clostridium_sp_cag_242
+2022-06-21 19:46:53 INFO::Fitting model to feature number 44, eubacterium_sp_cag_251
+2022-06-21 19:46:53 INFO::Fitting model to feature number 45, blautia_hydrogenotrophica
+2022-06-21 19:46:54 INFO::Fitting model to feature number 46, eubacterium_sp_cag_180
+2022-06-21 19:46:54 INFO::Fitting model to feature number 47, bacteroides_nordii
+2022-06-21 19:46:54 INFO::Fitting model to feature number 48, clostridium_disporicum
+2022-06-21 19:46:54 INFO::Fitting model to feature number 49, bacteroides_caccae
+2022-06-21 19:46:54 INFO::Fitting model to feature number 50, bacteroides_faecis
+2022-06-21 19:46:54 INFO::Fitting model to feature number 51, alistipes_indistinctus
+2022-06-21 19:46:54 INFO::Fitting model to feature number 52, ruminococcus_callidus
+2022-06-21 19:46:54 INFO::Fitting model to feature number 53, veillonella_dispar
+2022-06-21 19:46:54 INFO::Fitting model to feature number 54, sellimonas_intestinalis
+2022-06-21 19:46:54 INFO::Fitting model to feature number 55, eisenbergiella_tayi
+2022-06-21 19:46:54 INFO::Fitting model to feature number 56, ruminococcus_lactaris
+2022-06-21 19:46:54 INFO::Fitting model to feature number 57, bacteroides_plebeius
+2022-06-21 19:46:54 INFO::Fitting model to feature number 58, lactobacillus_rogosae
+2022-06-21 19:46:54 INFO::Fitting model to feature number 59, butyrivibrio_crossotus
+2022-06-21 19:46:55 INFO::Fitting model to feature number 60, bacteroides_fragilis
+2022-06-21 19:46:55 INFO::Fitting model to feature number 61, veillonella_parvula
+2022-06-21 19:46:55 INFO::Fitting model to feature number 62, veillonella_atypica
+2022-06-21 19:46:55 INFO::Fitting model to feature number 63, bacteroides_vulgatus
+2022-06-21 19:46:55 INFO::Fitting model to feature number 64, butyrivibrio_sp_cag_318
+2022-06-21 19:46:55 INFO::Fitting model to feature number 65, bacteroides_eggerthii
+2022-06-21 19:46:55 INFO::Fitting model to feature number 66, bacteroides_uniformis
+2022-06-21 19:46:55 INFO::Fitting model to feature number 67, bacteroides_stercoris
+2022-06-21 19:46:55 INFO::Fitting model to feature number 68, oscillibacter_sp_57_20
+2022-06-21 19:46:55 INFO::Fitting model to feature number 69, bacteroides_sp_cag_144
+2022-06-21 19:46:55 INFO::Fitting model to feature number 70, lachnospira_pectinoschiza
+2022-06-21 19:46:55 INFO::Fitting model to feature number 71, ruminococcus_bicirculans
+2022-06-21 19:46:55 INFO::Fitting model to feature number 72, flavonifractor_plautii
+2022-06-21 19:46:55 INFO::Fitting model to feature number 73, bacteroides_salyersiae
+2022-06-21 19:46:55 INFO::Fitting model to feature number 74, clostridium_bolteae
+2022-06-21 19:46:56 INFO::Fitting model to feature number 75, bacteroides_finegoldii
+2022-06-21 19:46:56 INFO::Fitting model to feature number 76, streptococcus_salivarius
+2022-06-21 19:46:56 INFO::Fitting model to feature number 77, eggerthella_lenta
+2022-06-21 19:46:56 INFO::Fitting model to feature number 78, paraprevotella_clara
+2022-06-21 19:46:56 INFO::Fitting model to feature number 79, anaerotruncus_colihominis
+2022-06-21 19:46:56 INFO::Fitting model to feature number 80, coprobacter_fastidiosus
+2022-06-21 19:46:56 INFO::Fitting model to feature number 81, bacteroides_intestinalis
+2022-06-21 19:46:56 INFO::Fitting model to feature number 82, clostridium_citroniae
+2022-06-21 19:46:56 INFO::Fitting model to feature number 83, clostridium_symbiosum
+2022-06-21 19:46:56 INFO::Fitting model to feature number 84, butyricimonas_virosa
+2022-06-21 19:46:56 INFO::Fitting model to feature number 85, oscillibacter_sp_cag_241
+2022-06-21 19:46:56 INFO::Fitting model to feature number 86, clostridium_lavalense
+2022-06-21 19:46:56 INFO::Fitting model to feature number 87, bacteroides_massiliensis
+2022-06-21 19:46:56 INFO::Fitting model to feature number 88, bacteroides_xylanisolvens
+2022-06-21 19:46:56 INFO::Fitting model to feature number 89, streptococcus_thermophilus
+2022-06-21 19:46:57 INFO::Fitting model to feature number 90, odoribacter_splanchnicus
+2022-06-21 19:46:57 INFO::Fitting model to feature number 91, streptococcus_parasanguinis
+2022-06-21 19:46:57 INFO::Fitting model to feature number 92, bacteroides_galacturonicus
+2022-06-21 19:46:57 INFO::Fitting model to feature number 93, parabacteroides_merdae
+2022-06-21 19:46:57 INFO::Fitting model to feature number 94, turicimonas_muris
+2022-06-21 19:46:57 INFO::Fitting model to feature number 95, eisenbergiella_massiliensis
+2022-06-21 19:46:57 INFO::Fitting model to feature number 96, anaerotignum_lactatifermentans
+2022-06-21 19:46:57 INFO::Fitting model to feature number 97, clostridium_asparagiforme
+2022-06-21 19:46:57 INFO::Fitting model to feature number 98, bacteroides_cellulosilyticus
+2022-06-21 19:46:57 INFO::Fitting model to feature number 99, bacteroides_thetaiotaomicron
+2022-06-21 19:46:57 INFO::Fitting model to feature number 100, paraprevotella_xylaniphila
+2022-06-21 19:46:57 INFO::Fitting model to feature number 101, parabacteroides_johnsonii
+2022-06-21 19:46:57 INFO::Fitting model to feature number 102, barnesiella_intestinihominis
+2022-06-21 19:46:57 INFO::Fitting model to feature number 103, agathobaculum_butyriciproducens
+2022-06-21 19:46:57 INFO::Fitting model to feature number 104, slackia_isoflavoniconvertens
+2022-06-21 19:46:58 INFO::Fitting model to feature number 105, sutterella_parvirubra
+2022-06-21 19:46:58 INFO::Fitting model to feature number 106, butyricimonas_synergistica
+2022-06-21 19:46:58 INFO::Fitting model to feature number 107, parabacteroides_distasonis
+2022-06-21 19:46:58 INFO::Fitting model to feature number 108, faecalibacterium_prausnitzii
+2022-06-21 19:46:58 INFO::Fitting model to feature number 109, parabacteroides_goldsteinii
+2022-06-21 19:46:58 INFO::Fitting model to feature number 110, gordonibacter_pamelaeae
+2022-06-21 19:46:58 INFO::Fitting model to feature number 111, collinsella_stercoris
+2022-06-21 19:46:58 INFO::Fitting model to feature number 112, clostridium_leptum
+2022-06-21 19:46:58 INFO::Fitting model to feature number 113, enterorhabdus_caecimuris
+2022-06-21 19:46:58 INFO::Fitting model to feature number 114, escherichia_coli
+2022-06-21 19:46:58 INFO::Fitting model to feature number 115, holdemania_filiformis
+2022-06-21 19:46:58 INFO::Fitting model to feature number 116, monoglobus_pectinilyticus
+2022-06-21 19:46:58 INFO::Fitting model to feature number 117, ruthenibacterium_lactatiformans
+2022-06-21 19:46:59 INFO::Fitting model to feature number 118, asaccharobacter_celatus
+2022-06-21 19:46:59 INFO::Fitting model to feature number 119, eubacterium_siraeum
+2022-06-21 19:46:59 INFO::Fitting model to feature number 120, fusicatenibacter_saccharivorans
+2022-06-21 19:46:59 INFO::Fitting model to feature number 121, eubacterium_rectale
+2022-06-21 19:46:59 INFO::Fitting model to feature number 122, collinsella_aerofaciens
+2022-06-21 19:46:59 INFO::Fitting model to feature number 123, intestinibacter_bartlettii
+2022-06-21 19:46:59 INFO::Fitting model to feature number 124, holdemanella_biformis
+2022-06-21 19:46:59 INFO::Fitting model to feature number 125, collinsella_intestinalis
+2022-06-21 19:46:59 INFO::Fitting model to feature number 126, adlercreutzia_equolifaciens
+2022-06-21 19:46:59 INFO::Fitting model to feature number 127, haemophilus_sp_hmsc71h05
+2022-06-21 19:46:59 INFO::Fitting model to feature number 128, turicibacter_sanguinis
+2022-06-21 19:46:59 INFO::Fitting model to feature number 129, acidaminococcus_intestini
+2022-06-21 19:46:59 INFO::Fitting model to feature number 130, akkermansia_muciniphila
+2022-06-21 19:46:59 INFO::Fitting model to feature number 131, anaeromassilibacillus_sp_an250
+2022-06-21 19:46:59 INFO::Fitting model to feature number 132, haemophilus_parainfluenzae
+2022-06-21 19:47:00 INFO::Fitting model to feature number 133, bifidobacterium_longum
+2022-06-21 19:47:00 INFO::Fitting model to feature number 134, bilophila_wadsworthia
+2022-06-21 19:47:00 INFO::Fitting model to feature number 135, bifidobacterium_bifidum
+2022-06-21 19:47:00 INFO::Fitting model to feature number 136, desulfovibrio_piger
+2022-06-21 19:47:00 INFO::Fitting model to feature number 137, lawsonibacter_asaccharolyticus
+2022-06-21 19:47:00 INFO::Fitting model to feature number 138, catenibacterium_mitsuokai
+2022-06-21 19:47:00 INFO::Fitting model to feature number 139, ruminococcaceae_bacterium_d5
+2022-06-21 19:47:00 INFO::Fitting model to feature number 140, intestinimonas_butyriciproducens
+2022-06-21 19:47:00 INFO::Fitting model to feature number 141, ruminococcaceae_bacterium_d16
+2022-06-21 19:47:00 INFO::Fitting model to feature number 142, clostridium_innocuum
+2022-06-21 19:47:00 INFO::Fitting model to feature number 143, bifidobacterium_adolescentis
+2022-06-21 19:47:00 INFO::Fitting model to feature number 144, clostridium_spiroforme
+2022-06-21 19:47:00 INFO::Fitting model to feature number 145, parasutterella_excrementihominis
+2022-06-21 19:47:00 INFO::Fitting model to feature number 146, methanobrevibacter_smithii
+2022-06-21 19:47:01 INFO::Fitting model to feature number 147, phascolarctobacterium_faecium
+2022-06-21 19:47:01 INFO::Fitting model to feature number 148, bifidobacterium_pseudocatenulatum
+2022-06-21 19:47:01 INFO::Fitting model to feature number 149, phascolarctobacterium_succinatutens
+2022-06-21 19:47:01 INFO::Fitting model to feature number 150, erysipelatoclostridium_ramosum
+2022-06-21 19:47:01 INFO::Fitting model to feature number 151, firmicutes_bacterium_cag_94
+2022-06-21 19:47:01 INFO::Fitting model to feature number 152, firmicutes_bacterium_cag_95
+2022-06-21 19:47:01 INFO::Fitting model to feature number 153, firmicutes_bacterium_cag_83
+2022-06-21 19:47:01 INFO::Fitting model to feature number 154, firmicutes_bacterium_cag_110
+2022-06-21 19:47:01 INFO::Fitting model to feature number 155, firmicutes_bacterium_cag_145
+2022-06-21 19:47:01 INFO::Fitting model to feature number 156, proteobacteria_bacterium_cag_139
+2022-06-21 19:47:01 INFO::Counting total values for each feature
+2022-06-21 19:47:01 WARNING::Deleting existing residuals file: ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//residuals.rds
+2022-06-21 19:47:01 INFO::Writing residuals to file ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//residuals.rds
+2022-06-21 19:47:01 WARNING::Deleting existing fitted file: ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//fitted.rds
+2022-06-21 19:47:01 INFO::Writing fitted values to file ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//fitted.rds
+2022-06-21 19:47:01 WARNING::Deleting existing ranef file: ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//ranef.rds
+2022-06-21 19:47:01 INFO::Writing extracted random effects to file ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//ranef.rds
+2022-06-21 19:47:01 INFO::Writing all results to file (ordered by increasing q-values): ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//all_results.tsv
+2022-06-21 19:47:01 INFO::Writing the significant results (those which are less than or equal to the threshold of 0.250000 ) to file (ordered by increasing q-values): ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//significant_results.tsv
+2022-06-21 19:47:01 INFO::Writing heatmap of significant results to file: ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all//heatmap.pdf
+2022-06-21 19:47:01 ERROR::Unable to plot heatmap
+2022-06-21 19:47:01 ERROR::err: could not find function "draw_colnames_45"
+ 2022-06-21 19:47:01 ERROR::err: draw_colnames_45(c("abx", "logcrp", "bmi12", "agemlvs"), gaps = NULL, fontsize = 6, hjust_col = 0, vjust_col = 0.5, angle_col = 270, border = TRUE)
+2022-06-21 19:47:01 INFO::Writing association plots (one for each significant association) to output folder: ./noGit/maaslin2/omega_output_a_trans_fs_ddr_logcrp_species_all/
+2022-06-21 19:47:01 INFO::Plotting associations from most to least significant, grouped by metadata
+2022-06-21 19:47:01 INFO::Plotting data for metadata number 1, abx
+2022-06-21 19:47:01 INFO::Creating scatter plot for continuous data, abx vs escherichia_coli
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs ruminococcus_torques
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs phascolarctobacterium_succinatutens
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs flavonifractor_plautii
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs clostridium_lavalense
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs dorea_longicatena
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs roseburia_faecis
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs hungatella_hathewayi
+2022-06-21 19:47:02 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:02 INFO::Creating scatter plot for continuous data, abx vs eubacterium_siraeum
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs acidaminococcus_intestini
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs bifidobacterium_pseudocatenulatum
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs agathobaculum_butyriciproducens
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs clostridium_innocuum
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs clostridium_sp_cag_253
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs sellimonas_intestinalis
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:03 INFO::Creating scatter plot for continuous data, abx vs clostridium_bolteae
+2022-06-21 19:47:03 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:05 INFO::Plotting data for metadata number 2, logcrp
+2022-06-21 19:47:05 INFO::Creating scatter plot for continuous data, logcrp vs eubacterium_sp_cag_251
+2022-06-21 19:47:05 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:05 INFO::Creating scatter plot for continuous data, logcrp vs barnesiella_intestinihominis
+2022-06-21 19:47:06 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:06 INFO::Creating scatter plot for continuous data, logcrp vs bacteroides_uniformis
+2022-06-21 19:47:06 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:06 INFO::Creating scatter plot for continuous data, logcrp vs parabacteroides_distasonis
+2022-06-21 19:47:06 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:06 INFO::Creating scatter plot for continuous data, logcrp vs butyrivibrio_sp_cag_318
+2022-06-21 19:47:06 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:06 INFO::Creating scatter plot for continuous data, logcrp vs parabacteroides_johnsonii
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs roseburia_faecis
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs firmicutes_bacterium_cag_83
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs bifidobacterium_bifidum
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs eubacterium_eligens
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs ruminococcus_torques
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs alistipes_inops
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:07 INFO::Creating scatter plot for continuous data, logcrp vs eubacterium_rectale
+2022-06-21 19:47:07 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:09 INFO::Plotting data for metadata number 3, bmi12
+2022-06-21 19:47:09 INFO::Creating scatter plot for continuous data, bmi12 vs bacteroides_stercoris
+2022-06-21 19:47:09 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:09 INFO::Creating scatter plot for continuous data, bmi12 vs bilophila_wadsworthia
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:10 INFO::Creating scatter plot for continuous data, bmi12 vs acidaminococcus_intestini
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:10 INFO::Creating scatter plot for continuous data, bmi12 vs eubacterium_ventriosum
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:10 INFO::Creating scatter plot for continuous data, bmi12 vs firmicutes_bacterium_cag_110
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:10 INFO::Creating scatter plot for continuous data, bmi12 vs roseburia_inulinivorans
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:10 INFO::Creating scatter plot for continuous data, bmi12 vs ruthenibacterium_lactatiformans
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:10 INFO::Creating scatter plot for continuous data, bmi12 vs clostridium_sp_cag_167
+2022-06-21 19:47:10 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:12 INFO::Plotting data for metadata number 4, agemlvs
+2022-06-21 19:47:12 INFO::Creating scatter plot for continuous data, agemlvs vs enterorhabdus_caecimuris
+2022-06-21 19:47:12 DEBUG::`geom_smooth()` using formula 'y ~ x'
+2022-06-21 19:47:12 INFO::Creating scatter plot for continuous data, agemlvs vs streptococcus_parasanguinis
+2022-06-21 19:47:12 DEBUG::`geom_smooth()` using formula 'y ~ x'
