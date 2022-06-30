@@ -11,13 +11,16 @@ getwd()
 ### Pre-processing steps 
 source("noGit/Rstart.R")
 
+
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-########################## (1) metadata ###############################################
+########################## (1) metadata Exposure Data ###############################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 ###################### read in channing metadata ###############################
 
-#Exposure Data
 
 z_mlvs_exposure_new <- read.table("noGit/mlvs_exposure_for_jorick.txt", 
                                   header=TRUE, sep='\t', check.names=TRUE, quote ="")
@@ -27,32 +30,37 @@ z_idkey <- read.csv('noGit/idkey.csv', header=TRUE, sep = ",", stringsAsFactors 
 rownames(z_idkey) <- z_idkey$id
 z_idkey <- z_idkey[order(z_idkey$id), ] 
 z_mlvs_exposure <- reassignKey(z_mlvs_exposure_new)
+z_mlvs_exposure$id <- as.integer(rownames(z_mlvs_exposure))
+
+
+########+ Plasma Data  from Mingyang#########
 
 z_plasma <- read.table("noGit/plasma_fatty_acids_sjbae.txt",
-                              header=TRUE, sep='\t', check.names=TRUE, quote ="")
-z_plasma$ID1 <- as.integer(substr(z_plasma$ID, 1, 6))
+                       header=TRUE, sep='\t', check.names=TRUE, quote ="")
+z_plasma$id <- as.integer(substr(z_plasma$ID, 1, 6)) 
+#get first 6 number of ID1 which stands for id in idkey file
 
-pp <- left_join(z_plasma, z_idkey, by = "ID1")
-pp <- pp[c("ID", "ID1", "id")]
-ppp <- left_join (z_mlvs_exposure_new, pp, by = "id")
-pppp <- _join(pp, z_mlvs_exposure_new, by = "id")
-write.table(pp, file = "noGit/matching_plasma_id.tsv", sep = "\t", col.names = TRUE, row.names = FALSE)
-sum(is.na(pp$id))
-sum(is.na(ppp$ID1))
-sum(is.na(pppp$))
+z_mlvs_exposure_plasma<- left_join(z_mlvs_exposure, z_plasma, by ="id")
+write.table(z_mlvs_exposure_plasma, file = "noGit/matching_exposure_plasma.tsv", sep = "\t", col.names = TRUE, row.names = FALSE)
+
+
+
+
+
+
 
 #gsub search and replace in files -> ~~_w1avg colnames changed to ~~_w1, etc.
-colnames(z_mlvs_exposure) <- gsub("w1avg","w1", colnames(z_mlvs_exposure)) 
-colnames(z_mlvs_exposure) <- gsub("w2avg","w2", colnames(z_mlvs_exposure))
-colnames(z_mlvs_exposure) <- gsub("plasma1","w1", colnames(z_mlvs_exposure))
-colnames(z_mlvs_exposure) <- gsub("plasma2","w2", colnames(z_mlvs_exposure))
+colnames(z_mlvs_exposure_plasma) <- gsub("w1avg","w1", colnames(z_mlvs_exposure_plasma)) 
+colnames(z_mlvs_exposure_plasma) <- gsub("w2avg","w2", colnames(z_mlvs_exposure_plasma))
+colnames(z_mlvs_exposure_plasma) <- gsub("plasma1","w1", colnames(z_mlvs_exposure_plasma))
+colnames(z_mlvs_exposure_plasma) <- gsub("plasma2","w2", colnames(z_mlvs_exposure_plasma))
 
-z_mlvs_agebmi <- z_mlvs_exposure [ , colnames(z_mlvs_exposure) %in% c('agemlvs', 'bmi12','act10','id')] 
+z_mlvs_agebmi <- z_mlvs_exposure_plasma [ , colnames(z_mlvs_exposure_plasma) %in% c('agemlvs', 'bmi12','act10','id')] 
 #id is actually rownames
 
-
+#cohort FFQ, ignore for now
 keep_metadata_cum <- c('ala10v','epa10v','dha10v','dpa10v','calor10v', 'trans10v', 'omega610v', 'omega310v', 'omega3_noala10v')
-z_metadata_cum <- z_mlvs_exposure[, keep_metadata_cum]
+z_metadata_cum <- z_mlvs_exposure_plasma[, keep_metadata_cum]
 
 keep_metadata_avg <- c(
   #ffq questionnaire
@@ -64,7 +72,7 @@ keep_metadata_avg <- c(
   'ala_avg', 'epa_avg', 'dha_avg', 'dpa_avg', 'omega3_avg', 'omega3_noala_avg', 'omega6_avg','trans_avg'
 )
 
-z_metadata_avg <- z_mlvs_exposure[, keep_metadata_avg]
+z_metadata_avg <- z_mlvs_exposure_plasma[, keep_metadata_avg]
 
 keep_metadata_w1 <- c(
   #questionnaire
@@ -89,9 +97,15 @@ keep_metadata_w2 <- c(
   'crp_w2','logcrp_w2', 'a_omega3_fs_dr_w2','a_omega3_noala_fs_dr_w2', 'loghdl_w2', 'logtg_w2', 'a_ala_fs_dr_w2', 'a_f205_fs_dr_w2', 'a_f226_fs_dr_w2', 'a_p22_5_fs_dr_w2', 'a_trn07_fo_dr_w2'
 )
 
-z_metadata_w1 <- z_mlvs_exposure[, keep_metadata_w1]
-z_metadata_w2 <- z_mlvs_exposure[, keep_metadata_w2]
-z_metadata_all <- cbind(z_mlvs_agebmi, z_metadata_cum, z_metadata_avg, z_metadata_w1, z_metadata_w2)
+z_metadata_w1 <- z_mlvs_exposure_plasma[, keep_metadata_w1]
+z_metadata_w2 <- z_mlvs_exposure_plasma[, keep_metadata_w2]
+
+keep_plasmafattyacid <- c('ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa')
+
+
+z_metadata_pfa <- z_mlvs_exposure_plasma[, keep_plasmafattyacid]
+
+z_metadata_all <- cbind(z_mlvs_agebmi, z_metadata_cum, z_metadata_avg, z_metadata_w1, z_metadata_w2, z_metadata_pfa)
 #z_metadata_all <- cbind(z_mlvs_agebmi, z_metadata_avg, z_metadata_w1, z_metadata_w2)
 
 
@@ -113,8 +127,16 @@ demographics_w2 <- c('agemlvs', 'bmicatmlvs')
 questionnaire_w2 <- c('acid_w2', 'alc_w2', 'abx_w2', 'prep_w2', 'selfdiet_w2', 'probx_w2', 'bristolcat_w2', 'bristolcat7', 'bristolcat8', 'oral_w2', 'yogurt_w2')
 energyfiber_w2 <- c('calor_fs_dr_w2', 'a_omega3_fs_dr_w2', 'a_omega3_noala_fs_dr_w2', 'a_ala_fs_dr_w2', 'a_f205_fs_dr_w2', 'a_f226_fs_dr_w2', 'a_p22_5_fs_dr_w2', 'a_trn07_fo_dr_w2') 
 
+
+
+
+
+
+
+
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-############################## (2) species data ###############################
+############################## (3) species data ###############################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # bring in legacy file - just for checking, I actually used species data in Channing
 # library(dplyr)
@@ -141,31 +163,42 @@ all_species <-all_species %>%
 all_species1 <- subset(all_species,!is.na(species))
 all_species1 <- as.data.frame(all_species1) #weird formatting change to maintain rows
 rownames(all_species1)<-all_species1$species
+
+
+
+###### TAX and OTU table
+TAX <- as.matrix(all_species1[,1:7])
+
+OTU <- all_species1[,8:ncol(all_species1)]
+# OTU maybe later
+
+######
+
 all_species1<-all_species1[,-c(1:7)]
 #all_species1<-all_species1[,-c(1:8)]
 
-all_species <- as.data.frame(all_species1)
+all_species1 <- as.data.frame(all_species1)
 
-dim(all_species)
+dim(all_species1)
 # [1] 468 929
 # sunjeong: [1] 543 929
 
-all_sample <- colnames(all_species)
+all_sample <- colnames(all_species1)
 #View(all_sample)
 
 # remove guy with colectomy 
-all_species <- all_species[ , !colnames(all_species) %in% c(grep("15074981", colnames(all_species), value = T))]
-dim(all_species)
+all_species1 <- all_species1[ , !colnames(all_species1) %in% c(grep("15074981", colnames(all_species1), value = T))]
+dim(all_species1)
 # [1] 468 925
 # sunjeong: [1] 543 925
 #colSums(all_species)
 
 # generate list of species after abundance/prevalence filtering
 # since this file is scaled to 100, i am keeping bugs with >10% prevalence and 0.01 abundance (i.e. .0001*100 when relab is scaled 0-1 and not 0-100)
-dim(all_species[apply(all_species, 1, function(bug) sum(bug >= 0.01) >= 0.1*ncol(all_species)), ])
+dim(all_species1[apply(all_species1, 1, function(bug) sum(bug >= 0.01) >= 0.1*ncol(all_species1)), ])
 # [1] 139 925 = the 139 species after QC included in initial starr manuscripts
 # sunjeong: [1] 156 925
-all_species_filt <- all_species[ apply(all_species, 1, function(bug) sum(bug >= 0.01) >= 0.1*ncol(all_species)), ]
+all_species_filt <- all_species1[ apply(all_species1, 1, function(bug) sum(bug >= 0.01) >= 0.1*ncol(all_species1)), ]
 
 
 
@@ -181,7 +214,7 @@ all_species_filt   <- all_species_filt  / 100
 #colnames(z_species.s1) <- gsub("*_s\\d","", colnames(z_species.s1))
 
 # the species i want to keep are designated by filtering above (species_list), gonna lower case it and get rid of leading "s__"
-rownames(all_species_filt) <- tolower(gsub(pattern = "s__", "", rownames(all_species_filt)))
+#_rownames(all_species_filt) <- tolower(gsub(pattern = "s__", "", rownames(all_species_filt)))
 all_species_filt <- t(all_species_filt)
 all_species_filt <- as.data.frame(all_species_filt)
 
@@ -200,7 +233,7 @@ species_all <- all_species_filt[,!colnames(all_species_filt) %in% c('id','st')]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #append metadata onto short- and long-term .pcl files
 # metadata_all doesn't have a participants variable 
-z_metadata_all$participant <- rownames(z_metadata_all)
+z_metadata_all$participant <- z_metadata_all$id
 
 # merge the species and metadata tables 
 z_merged.all <- merge(x = z_species.all, y = z_metadata_all, by = 'participant', all.x = TRUE)
@@ -434,6 +467,10 @@ a_omega3_fs_ddr_1.5IQR <- a_omega3_fs_ddr[a_omega3_fs_ddr$a_omega3_fs_dr<=4.3791
 a_omega3_fs_ddr_3IQR <- a_omega3_fs_ddr[a_omega3_fs_ddr$a_omega3_fs_fs_dr<=6.006626,]
 
 mlvs_metadata_925 <- z_w12.all_species.all[,!colnames(z_w12.all_species.all) %in% colnames(species_all)]
+
+
+
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #############  [3] pcl writing  ############
