@@ -56,7 +56,7 @@ source("Rstart.R")
 meta_id <- read.table("data/mlvs_exposure_for_jorick.txt", header=TRUE, sep='\t', check.names=TRUE, quote ="")
 idkey <- read.csv('idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
 rownames(idkey) <- idkey$id
-meta_id<- inner_join(idkey, meta_id, by="id")
+meta_id<- left_join(idkey, meta_id, by="id")
 
 #### Import Plasma data by individual#####
 plasma <- read.table("data/plasma_fatty_acids_sjbae.txt",
@@ -77,11 +77,15 @@ meta_pl_id$ala_w1 <- meta_pl_id$a_ala_fs_dr_w1
 meta_pl_id$epa_w1 <- meta_pl_id$a_f205_fs_dr_w1
 meta_pl_id$dha_w1 <- meta_pl_id$a_f226_fs_dr_w1
 meta_pl_id$dpa_w1 <- meta_pl_id$a_p22_5_fs_dr_w1
+meta_pl_id$omega3_noala_w1 <- meta_pl_id$a_omega3_noala_fs_dr_w1
+meta_pl_id$omega3_w1 <- meta_pl_id$a_omega3_fs_dr_w1
 
 meta_pl_id$ala_w2 <- meta_pl_id$a_ala_fs_dr_w2
 meta_pl_id$epa_w2 <- meta_pl_id$a_f205_fs_dr_w2
 meta_pl_id$dha_w2 <- meta_pl_id$a_f226_fs_dr_w2
 meta_pl_id$dpa_w2 <- meta_pl_id$a_p22_5_fs_dr_w2
+meta_pl_id$omega3_noala_w2 <- meta_pl_id$a_omega3_noala_fs_dr_w2
+meta_pl_id$omega3_w2 <- meta_pl_id$a_omega3_fs_dr_w2
 
 ##### save the metadata of exposure and plasma outcome ####
 
@@ -208,3 +212,12 @@ rownames(species_nona) <- rownames(meta_species_nona)
 
 write.csv(meta_stn_nona, file="./data/meta_stn_nona.csv")
 write.csv(species_nona, file="./data/species_nona.csv")
+
+meta_species_nona$smoke12
+
+
+library(haven)
+sas <- read_sas("./data/mlvs_meta_data.sas")
+
+
+

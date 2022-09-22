@@ -41,15 +41,44 @@ meta_stn$ID1 <- as.factor(meta_stn$ID1)
 # tspecies_bc <- vegdist(t(species), "bray")
 
 # PERMANOVA using adonis2, strata=as.factor(meta_med$SubjectID)
+colnames(meta_stn)
+meta_stn$ala_pfa
+perm_list <- list(omega3_w, omega3_noala_w, ala_w, epa_w, dha_w, dpa_w,
+                  omega3_avg, omega3_noala_avg, ala_avg, epa_avg, dpa_avg, dha_avg,
+                  ala_pfa, epa_pfa, dha_pfa, dpa_pfa, # only 1 plasma metabolite data
+                  bmi10, calor10n, wt10, act10,calor_fs_dr_w,#fatmass, 6moweightchange, changesinceage21,
+                  agemlvs, smoke10, alco10m, abx_avg, alc_avg, probx_avg, bristol_avg,
+                  
+                  logcrp_w, crp_w, crp_avg,
+                  hdlc_w, tchdl_w, tc_w, 
+                  logtchdl_w, logtc_w, loghdl_w, logtg_w,tg_w 
+                  )
+perm_list <- c("omega3_w", "omega3_noala_w", "ala_w", "epa_w", "dha_w", "dpa_w",
+                  'omega3_avg', 'omega3_noala_avg', 'ala_avg', 'epa_avg', "dpa_avg", "dha_avg",
+                  'ala_pfa', 'epa_pfa', 'dha_pfa', 'dpa_pfa', # only 1 plasma metabolite data
+                  'bmi10', 'calor10n', 'wt10', 'act10','calor_fs_dr_w',#fatmass, 6moweightchange, changesinceage21,
+                  'agemlvs', 'smoke10','alco10n', 'abx_avg', 'alc_avg', 'probx_avg', 'bristol_avg',
+                  'logcrp_w', 'crp_w', 'crp_avg',
+                  'hdlc_w', 'tchdl_w', 'tc_w', 
+                  'logtchdl_w', 'logtc_w', 'loghdl_w', 'logtg_w','tg_w' )
+length(perm_list)
+#permanova <- data.frame()
 
+# meta_stn[,perm_list[1]]
+p=perm_list[2]
+# as.name(p)
 
-s <- species %>% filter (!is.na(meta_stn$logcrp_w))
-m <- meta_stn %>% filter(!is.na(logcrp_w))
-a <- adonis2(formula = s ~ logcrp_w, strata=m$ID1,  
-        data = m, permutations = 999, na.action = na.exclude)
-summary(a)
+for (p in perm_list){
+  s <- species %>% filter (!is.na(meta_stn[,p]))
+  m <- meta_stn %>% filter(!is.na(meta_stn[,p]))
+  a <- adonis2(formula = s ~ m[,p], strata=m$ID1,  
+               data = m, permutations = 999, na.action = na.exclude)
+  x <- data.frame(name = p, a[1,c("R2","Pr(>F)")])
+  permanova <- rbind (permanova, x)
+}
 
-paee_pam <- x$aov.tab[1,c("R2","Pr(>F)")]
+row.name(permanova) <- perm_list
+
 
 #+ na.action = 
 #+ na.fail ; defalt
@@ -63,155 +92,65 @@ paee_pam <- x$aov.tab[1,c("R2","Pr(>F)")]
 #+ there shouldn't be any NAs in logcrp_w
 
 
+permanova$name <- as.factor(permanova$name)
+permanova$R2 <- as.numeric(permanova$R2)
+permanova$stars <- cut(permanova$Pr..F., breaks=c(-Inf, 0.01, 0.05, 0.10, Inf), label=c("***","**", "*", ""))
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ paee_pam , strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-paee_pam <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(paee_pam)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ mets_vigpam , strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-mets_vigpam <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(mets_vigpam)
+write.table(permanova, file = "data/permanova.tsv", sep = "\t", col.names = TRUE, row.names = TRUE)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ mets_modpam , strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-mets_modpam <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(mets_modpam)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ mets_ltpam , strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-mets_ltpam <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(mets_ltpam)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ act_paqlong , strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-act_paqlong <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(act_paqlong)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ vpa_paqlong ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-vpa_paqlong <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(vpa_paqlong)
+permanova2 <- permanova %>% filter(name != c("wt10"))
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ mpa_paqlong ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-mpa_paqlong <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(mpa_paqlong)
+ggplot(permanova2, aes(x=R2, y=name)) +
+  geom_bar(stat="identity")+
+  theme_light()+
+  scale_x_continuous(labels=percent, limits = c(0, 0.02))+
+  geom_text(aes(label=stars), color="black", size=5) +
+  #scale_fill_manual(values = color_code)+ coord_flip()+
+  theme_classic()+
+  theme(axis.line = element_line(colour = "black", 
+                                 size = 1, linetype = "solid"),
+        legend.position = "none",
+        legend.text = element_text(size = 10,color="black"),
+        legend.title = element_blank(),
+        plot.title = element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10,color="black"),
+        axis.text.x = element_text(size=10,color="black"))  
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ lpa_paqlong ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-lpa_paqlong <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(lpa_paqlong)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ bmi_dlw ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-bmi_dlw <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(bmi_dlw)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ pfat_dlw ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-pfat_dlw <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(pfat_dlw)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ weightchg_blood ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-weightchg_blood <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(weightchg_blood)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ wtchgsto21 ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-wtchgsto21 <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(wtchgsto21)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ lg2crp ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-lg2crp <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(lg2crp)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ lg2hba1c ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-lg2hba1c <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(lg2hba1c)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ ahei ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-ahei <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(ahei)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~  calor122cn ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-calor122cn <- x$aov.tab[2,c("R2","Pr(>F)")]
-summary(calor122cn)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~  ant_12mo_qu ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-ant_12mo_qu <- x$aov.tab[2,c("R2","Pr(>F)")]
-summary(ant_12mo_qu)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ probio_2mo_qu ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-probio_2mo_qu <- x$aov.tab[3,c("R2","Pr(>F)")]
-summary(probio_2mo_qu)
+short= c("omega3_w", "omega3_noala_w", "ala_w", "epa_w", "dha_w", "dpa_w")
+long= c('omega3_avg', 'omega3_noala_avg', 'ala_avg', 'epa_avg', "dpa_avg", "dha_avg")
+plasma = c('ala_pfa', 'epa_pfa', 'dha_pfa', 'dpa_pfa')
+health = c('bmi10', 'calor10n', 'wt10', 'act10','calor_fs_dr_w',#fatmass, 6moweightchange, changesinceage21,
+           'agemlvs', 'smoke10','alco10n', 'abx_avg', 'alc_avg', 'probx_avg', 'bristol_avg')
+inflammation =  c('logcrp_w', 'crp_w', 'crp_avg',
+                  'hdlc_w', 'tchdl_w', 'tc_w', 
+                  'logtchdl_w', 'logtc_w', 'loghdl_w', 'logtg_w','tg_w' )
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ stool_type ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-stool_type <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(stool_type)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ age_fecal ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-age_fecal <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(age_fecal)
 
-x <- adonis(formula = ttax_rpk_rel_bc ~ smk ,  strata=as.factor(meta_med$SubjectID),  data = meta_med, permutations = 999) 
-x
-smk <- x$aov.tab[1,c("R2","Pr(>F)")]
-summary(smk)
 
-all_taxonomy <-rbind(paee_pam,
-                     mets_vigpam,
-                     mets_modpam,
-                     mets_ltpam,
-                     act_paqlong, 
-                     vpa_paqlong, 
-                     mpa_paqlong,
-                     lpa_paqlong,
-                     bmi_dlw, 
-                     pfat_dlw,
-                     weightchg_blood,
-                     wtchgsto21, 
-                     lg2crp, 
-                     lg2hba1c,
-                     ahei,
-                     calor122cn,
-                     ant_12mo_qu,
-                     probio_2mo_qu,
-                     stool_type,
-                     age_fecal,
-                     smk)
 
-component<- c('Recent total PA',
-              'Recent vigorous PA',
-              'Recent moderate PA',
-              'Recent light PA',
-              'Long-term total PA',
-              'Long-term vigorous PA',
-              'Long-term moderate PA',
-              'Long-term light PA',
-              'BMI',
-              'Fat mass %',
-              '6-month weight change',
-              'Weight change since age 21',
-              'C-reactive protein',
-              'Hemoglobin A1c',
-              'Alternative Healthy Eating Index',
-              'Total energy intake',
-              'Antibiotics use',
-              'Probiotics use',
-              'Bristol score',
-              'Age',
-              'Smoking')  
+permanova %>% 
+  mutate(cat = ifelse(sum(name == short), "short",
+                      ifelse(sum(name == long), "long",
+                             ifelse(sum(name == plasma), "plasma",
+                                    ifelse(sum(name == health), "health","inflammation")))))
+                        
 
 all_taxonomy<-cbind(all_taxonomy, component)
 all_taxonomy_pa<-all_taxonomy[1:8,]

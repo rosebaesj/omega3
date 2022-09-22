@@ -36,7 +36,7 @@ z_mlvs_exposure$id <- as.integer(rownames(z_mlvs_exposure))
 ########+ Plasma Data  from Mingyang#########
 setwd("..")
 z_plasma <- read.table("noGit/plasma_fatty_acids_sjbae.txt",
-                       header=TRUE, sep='\t', check.names=TRUE, quote ="")
+                       header=TRUE, sep='\t', check.names =TRUE, quote ="")
 z_plasma$id <- as.integer(substr(z_plasma$ID, 1, 6)) 
 #get first 6 number of ID1 which stands for id in idkey file
 
