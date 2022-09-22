@@ -52,45 +52,7 @@ source("Rstart.R")
 
 ###### DATA PREPARATION ########
 
-#### Import Metadata by individual #####
-meta_id <- read.table("data/mlvs_exposure_for_jorick.txt", header=TRUE, sep='\t', check.names=TRUE, quote ="")
-idkey <- read.csv('idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
-rownames(idkey) <- idkey$id
-meta_id<- left_join(idkey, meta_id, by="id")
-
-#### Import Plasma data by individual#####
-plasma <- read.table("data/plasma_fatty_acids_sjbae.txt",
-                       header=TRUE, sep='\t', check.names=TRUE, quote ="")
-plasma$ID1 <- as.integer(substr(plasma$ID, 1, 6)) 
-#get first 6 number of ID1 which stands for id in idkey file
-
-#### Merge and get individual metadata 
-meta_pl_id<- inner_join(meta_id, plasma, by ="ID1")
-
-#### set weeks #####
-colnames(meta_pl_id) <- gsub("w1avg","w1", colnames(meta_pl_id)) 
-colnames(meta_pl_id) <- gsub("w2avg","w2", colnames(meta_pl_id))
-colnames(meta_pl_id) <- gsub("plasma1","w1", colnames(meta_pl_id))
-colnames(meta_pl_id) <- gsub("plasma2","w2", colnames(meta_pl_id))
-
-meta_pl_id$ala_w1 <- meta_pl_id$a_ala_fs_dr_w1
-meta_pl_id$epa_w1 <- meta_pl_id$a_f205_fs_dr_w1
-meta_pl_id$dha_w1 <- meta_pl_id$a_f226_fs_dr_w1
-meta_pl_id$dpa_w1 <- meta_pl_id$a_p22_5_fs_dr_w1
-meta_pl_id$omega3_noala_w1 <- meta_pl_id$a_omega3_noala_fs_dr_w1
-meta_pl_id$omega3_w1 <- meta_pl_id$a_omega3_fs_dr_w1
-
-meta_pl_id$ala_w2 <- meta_pl_id$a_ala_fs_dr_w2
-meta_pl_id$epa_w2 <- meta_pl_id$a_f205_fs_dr_w2
-meta_pl_id$dha_w2 <- meta_pl_id$a_f226_fs_dr_w2
-meta_pl_id$dpa_w2 <- meta_pl_id$a_p22_5_fs_dr_w2
-meta_pl_id$omega3_noala_w2 <- meta_pl_id$a_omega3_noala_fs_dr_w2
-meta_pl_id$omega3_w2 <- meta_pl_id$a_omega3_fs_dr_w2
-
-##### save the metadata of exposure and plasma outcome ####
-
-write.table(meta_pl_id, file = "meta_pl_id.tsv", sep = "\t", col.names = TRUE, row.names = TRUE)
-
+####### 1) Microbiome Taxonomic Table ######
 
 #### TAXONOMY DATA ####
 # read in taxonomy data
@@ -151,40 +113,239 @@ write.table(species_filt, file = "./data/species_filt.csv", sep = ",", col.names
 
 
 
+### 2) Metadata of Dietary #########
+
+#### + Import Metadata by individual #####
+meta_id <- read.table("data/mlvs_exposure_for_jorick.txt", header=TRUE, sep='\t', check.names=TRUE, quote ="")
+idkey <- read.csv('idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
+rownames(idkey) <- idkey$id
+meta_id<- left_join(idkey, meta_id, by="id")
+
+
+#### + set Phase #####
+#+ ph0 : long term
+#+ ph1 : first two stools
+#+ ph2 : second two stools
+
+#### all together ####
+colnames(meta_id) <- gsub("w1avg","w1", colnames(meta_id)) 
+colnames(meta_id) <- gsub("w2avg","w2", colnames(meta_id))
+
+phase1 <- meta_id %>% select(ID1, contains('_w1'), contains('ffq1'), contains('plasma1'), contains('qu1'))
+phase2 <- meta_id %>% select(ID1, contains('_w2'), contains('ffq2'), contains('plasma2'), contains('qu2'))
+
+colnames(phase1) <- str_replace_all(colnames(phase1),  c("_w1" = "_ddr", "ffq1" = "ffq", "plasma1" = "plasma", "qu1" = "qu"))
+colnames(phase2) <- str_replace_all(colnames(phase2),  c("_w2" = "_ddr", "ffq2" = "ffq", "plasma2" = "plasma", "qu2" = "qu"))
+
+##### missing data ####
+dim(phase1)==dim(phase2)
+
+for (i in 1:ncol(phase1)){
+  for (j in 1:nrow(phase1)){
+    if (is.na(phase1[j,i])){phase1[j,i]<- phase2[j,i]}
+  }
+}
+for (i in 1:ncol(phase2)){
+  for (j in 1:nrow(phase2)){
+    if (is.na(phase2[j,i])){phase2[j,i]<- phase1[j,i]}
+  }
+}
+
+phase1$phase <- c("ph1")
+phase2$phase <- c("ph2")
+meta_id_nophase <- meta_id %>% select(everything(), 
+                                      -contains('_w1'), -contains('ffq1'), -contains('plasma1'), -contains('qu1'),
+                                      -contains('_w2'), -contains('ffq2'), -contains('plasma2'), -contains('qu2'))
+
+
+# #### + a) DDR #####
+# colnames(meta_id) <- gsub("w1avg","w1", colnames(meta_id)) 
+# colnames(meta_id) <- gsub("w2avg","w2", colnames(meta_id))
+# 
+# ddr1 <- meta_id %>% select(ID1, contains('_w1'))
+# ddr2 <- meta_id %>% select(ID1, contains('_w2'))
+# 
+# colnames(ddr1) <- str_replace_all(colnames(ddr1),  c("_w1" = "_ddr"))
+# colnames(ddr2) <- str_replace_all(colnames(ddr2),  c("_w2" = "_ddr"))
+# 
+# 
+# dim(ddr1)==dim(ddr2)
+# 
+# for (i in 1:ncol(ddr1)){
+#   for (j in 1:nrow(ddr1)){
+#     if (is.na(ddr1[j,i])){ddr1[j,i]<- ddr2[j,i]}
+#   }
+# }
+# for (i in 1:ncol(ddr2)){
+#   for (j in 1:nrow(ddr2)){
+#     if (is.na(ddr2[j,i])){ddr2[j,i]<- ddr1[j,i]}
+#   }
+# }
+# ddr1$phase <- c("ph1")
+# ddr2$phase <- c("ph2")
+# meta_id_noddr <- meta_id %>% select(everything(), -contains('_w1'), -contains('_w2'))
+
+
+
+# #### + e) avg is from ffq1 ffq2, qu1 qu2 ####
+# avg <- meta_id_noddr_noffq_noplasma_noqu %>% select(ID1, contains('_avg'))
+# 
+# meta_id_noddr_noffq_noplasma_noqu_noavg <- meta_id_noddr_noffq_noplasma_noqu %>% select(everything(), -contains('avg'))
+# 
+# #### + f) 10v is cummulative ffq ####
+# cum10v <- meta_id_noddr_noffq_noplasma_noqu_noavg %>% select(ID1, contains('10v'))
+# 
+# meta_id_noddr_noffq_noplasma_noqu_noavg_no10v <- meta_id_noddr_noffq_noplasma_noqu_noavg %>% select(everything(), -contains('10v'))
+# 
+# basic <- meta_id_noddr_noffq_noplasma_noqu_noavg_no10v
+
+
+#### LETS MERGE METADATA with sample num ####
+
+all_species_filt <- all_species_filt %>%
+  mutate(phase = ifelse(stn=="s1"|stn=="s2","ph1",
+                        ifelse(stn=="s3"|stn=="s4", "ph2", NA))) %>%
+  mutate(ID1_stn = rownames(all_species_filt))
+all_species_filt$ID1 <- as.integer(all_species_filt$ID1)
+samplenum <- all_species_filt %>% select(ID1_stn, ID1) 
+samplenum_ph1 <- all_species_filt %>% 
+  filter(phase=="ph1")%>%
+  select(ID1_stn, ID1)
+samplenum_ph2 <- all_species_filt %>% 
+  filter(phase=="ph2")%>%
+  select(ID1_stn, ID1)
+
+
+#colnames(phase1)==colnames(phase2)
+colnames(phase1)<-colnames(phase2)
+
+meta_id_nophase<- dplyr::rename(meta_id_nophase, pha= phase)
+
+samplenum_noph <- left_join(samplenum, meta_id_nophase, by = "ID1")
+
+samplenum_ph1 <- left_join(samplenum_ph1, phase1, by = "ID1")
+samplenum_ph2 <- left_join(samplenum_ph2, phase2, by = "ID1")
+
+samplenum_ph <- rbind(samplenum_ph1, samplenum_ph2)
+
+samplenum_ph <- samplenum_ph %>% select(everything(), -'ID1')
+
+metadata_diet <- left_join(samplenum_noph, samplenum_ph, by = "ID1_stn")
+
+
+#### 3) Bristol score #####
+
+bristol5 <- metadata_diet %>% 
+  mutate(ID1_stn = paste(ID1,"_s1")) %>%
+  select(ID1_stn, bristol=bristol5, bristolcat=bristolcat5)
+
+bristol6 <- metadata_diet %>% 
+  mutate(ID1_stn = paste(ID1,"_s2")) %>%
+  select(ID1_stn, bristol=bristol6, bristolcat=bristolcat6)
+
+bristol7 <- metadata_diet %>% 
+  mutate(ID1_stn = paste(ID1,"_s3")) %>%
+  select(ID1_stn, bristol=bristol7, bristolcat=bristolcat7)
+
+bristol8 <- metadata_diet %>% 
+  mutate(ID1_stn = paste(ID1,"_s4")) %>%
+  select(ID1_stn, bristol=bristol8, bristolcat=bristolcat8)
+
+##### missing data ####
+for (i in 1:nrow(bristol5)){
+  if (is.na(bristol5[i,2])){bristol5[i,2]<- metadata_diet$bristol_avg[i]}
+  if (is.na(bristol6[i,2])){bristol6[i,2]<- metadata_diet$bristol_avg[i]}
+  if (is.na(bristol7[i,2])){bristol7[i,2]<- metadata_diet$bristol_avg[i]}
+  if (is.na(bristol8[i,2])){bristol8[i,2]<- metadata_diet$bristol_avg[i]}
+  
+  if (is.na(bristol5[i,3])){bristol5[i,3]<- metadata_diet$bristolcat_avg[i]}
+  if (is.na(bristol6[i,3])){bristol6[i,3]<- metadata_diet$bristolcat_avg[i]}
+  if (is.na(bristol7[i,3])){bristol7[i,3]<- metadata_diet$bristolcat_avg[i]}
+  if (is.na(bristol8[i,3])){bristol8[i,3]<- metadata_diet$bristolcat_avg[i]}
+}
+
+bristol <- rbind(bristol5, bristol6, bristol7, bristol8)
+metadata_db <- left_join(metadata_diet, bristol, by='ID1_stn')
+
+metadata_db <- metadata_db %>% select(everything(), -'bristol5', -'bristol6', -'bristol7', -'bristol8',
+                                            -'bristolcat5', -'bristolcat6', -'bristolcat7', -'bristolcat8')
+
+
+
+
+
+
+
+#### 3) Import Metabolite data by individual#####
+plasma <- read.table("data/plasma_fatty_acids_sjbae.txt",
+                     header=TRUE, sep='\t', check.names=TRUE, quote ="")
+plasma <- plasma %>%
+  mutate(ID1 = as.integer(substr(plasma$ID, 1, 6)))%>%
+  mutate(omega3_pfa = ala_pfa+ epa_pfa+ dpa_pfa+ dha_pfa,
+         omega3_noala_pfa= epa_pfa+ dpa_pfa+ dha_pfa,
+         omega6_pfa = P1+P2+P5+ P6+ P8+P9+P12)
+#get first 6 number of ID1 which stands for id in idkey file
+
+#### Merge and get individual metadata 
+metadata_dbp<- left_join(metadata_db, plasma, by ="ID1")
+
+
+
+
+### 4) metadata of interest ####
+basic <-   c('ID1_stn', 'ID1', 'phase',
+           'agemlvs', 'bmi10', 'bmi12', 'wt10', 'wt12', 'smoke10', 'smk12', 'ncig12', 'bmic10', 'bmic12', 'bmi12cat', 'smoke12', 
+           'calor10n', 'alco10n', 'calor10v', 'calor_avg', 'alco_avg', 'abx_avg', 'probx_avg', 'alc_avg', 'bristol', 'bristolcat', 'bristol_avg', 'bristolcat_avg',
+           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr' )
+# smoke12 is ordinal
+exposure_long <- c('ala10v', 'epa10v', 'dha10v', 'trans10v', 'omega610v', 'omega3_noala10a', 'dpa10v', 'omega310v', 'omega3_noala10v')
+exposure_avg <- c('ala_avg', 'epa_avg', 'dpa_avg', 'trans_avg', 'omega3_avg', 'omega6_avg', 'omega3_noala_avg', 'fishavg')
+exposure_short <- c( 'ala_ddr' = 'a_ala_fs_dr_ddr',
+                     'epa_ddr' = 'a_f205_fs_dr_ddr',
+                     'dha_ddr' = 'a_f226_fs_dr_ddr',
+                     'dpa_ddr' = 'a_p22_5_fs_dr_ddr',
+                     'omega3_noala_ddr' = 'a_omega3_noala_fs_dr_ddr',
+                     'omega3_ddr' = 'a_omega3_fs_dr_ddr',
+                        'a_fat_fs_dr_ddr')
+exposure_1yr <- c('ala_ffq', 'epa_ffq', 'dpa_ffq', 'dha_ffq', 'omega3_ffq', 'omega6_ffq', 'omega3_noala_ffq', 'omega_3_epa_ffq',
+                  'tuna_ffq', 'dk_fish_ffq', 'oth_fish_ffq','fishffq')
+outcome_plasma <- c('folate_plasma', 'tc_plasma', 'hdlc_plasma', 'tg_plasma', 'crp_plasma',  'crp_plasmacat', 'tchdl_plasma', 
+            'logtchdl_plasma', 'logcrp_plasma', 'logtc_plasma', 'loghdl_plasma', 'logtg_plasma')
+outcome_pfa <- c('ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 
+                'AA_pfa' = 'P8', 
+                'omega3_pfa','omega3_noala_pfa','omega6_pfa')
+
+metadata_intrst <- metadata_dbp %>%
+  select(basic, exposure_long, exposure_avg, exposure_1yr, exposure_short,
+         outcome_plasma, outcome_pfa)
+
+
+
+
+###3) Missing data ####
+median <- metadata_intrst %>% 
+  dplyr::summarise(across(everything(), ~ mean(as.numeric(.x), na.rm=T))) 
+
+
+
+for (i in 1:ncol(metadata_intrst)){
+  for( j in 1:nrow(metadata_intrst)){
+    if(is.na(metadata_intrst[j,i])){metadata_intrst[j,i]<- median[1,i]}
+  }
+}
+
+
+###DONE!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
 
 
 ##### metadata by stool ####
 
-
-meta_stn <- all_species_filt[names(all_species_filt) == c('ID1', 'stn')]
-meta_stn$id_st <- row.names(meta_stn)
-meta_stn$ID1 <- as.integer(meta_stn$ID1)
-
-
-##****find how to put weekly data separately ***##
-
-w1 <- meta_pl_id %>% select(ID1, contains('_w1'))
-w2 <- meta_pl_id %>% select(ID1, contains('_w2'))
-
-colnames(w1) <- str_replace_all(colnames(w1),  c("_w1" = "_w"))
-colnames(w2) <- str_replace_all(colnames(w1),  c("_w2" = "_w"))
-
-stn12 <- meta_stn %>% filter(stn %in% c("s1", "s2"))
-stn34 <- meta_stn %>% filter(stn %in% c("s3", "s4"))
-
-id_w1 <- left_join(stn12, w1, by = "ID1")
-id_w2 <- left_join(stn34, w2, by = "ID1")
-id_w <- rbind(id_w1, id_w2)
-id_w <- id_w %>% select(-c(ID1, stn))
-
-no_w1w2 <- meta_pl_id %>% select(everything(), -contains('_w1'), -contains('_w2'))
-meta_stn <- left_join(meta_stn, no_w1w2, by = "ID1")
-meta_stn <- left_join(meta_stn, id_w, by = "id_st")
-rownames(meta_stn) <- meta_stn$id_st
-meta_stn <- meta_stn %>% select(-c(id_st))
-# avg <- meta_id %>% select(ID1, contains('avg'), -contains('_avg'))
-
-### what about ffq1, ffq2
 
 write.table(meta_stn, file = "data/meta_stn.tsv", sep = "\t", col.names = TRUE, row.names = TRUE)
 
