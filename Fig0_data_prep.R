@@ -41,8 +41,6 @@ library(ggpubr)
 library(tidyverse)
 library(vegan)
 library(RColorBrewer)
-library(grid)
-library(ggpubr)
 library(viridis)
 library("Hmisc")
 library(reshape2)
@@ -110,6 +108,11 @@ species_filt <- all_species_filt[,!colnames(all_species_filt) %in% c('ID1','stn'
 ##### save the metadata of exposure and plasma outcome ####
 
 write.table(species_filt, file = "./data/species_filt.csv", sep = ",", col.names = TRUE, row.names = TRUE)
+
+
+
+
+
 
 
 
@@ -206,6 +209,7 @@ all_species_filt <- all_species_filt %>%
   mutate(phase = ifelse(stn=="s1"|stn=="s2","ph1",
                         ifelse(stn=="s3"|stn=="s4", "ph2", NA))) %>%
   mutate(ID1_stn = rownames(all_species_filt))
+
 all_species_filt$ID1 <- as.integer(all_species_filt$ID1)
 samplenum <- all_species_filt %>% select(ID1_stn, ID1) 
 samplenum_ph1 <- all_species_filt %>% 
@@ -277,26 +281,30 @@ metadata_db <- metadata_db %>% select(everything(), -'bristol5', -'bristol6', -'
 
 
 #### 3) Import Metabolite data by individual#####
-plasma <- read.table("data/plasma_fatty_acids_sjbae.txt",
+pfa <- read.table("data/plasma_fatty_acids_sjbae.txt",
                      header=TRUE, sep='\t', check.names=TRUE, quote ="")
-plasma <- plasma %>%
-  mutate(ID1 = as.integer(substr(plasma$ID, 1, 6)))%>%
+pfa <- pfa %>%
+  mutate(ID1 = as.integer(substr(pfa$ID, 1, 6)))%>%
   mutate(omega3_pfa = ala_pfa+ epa_pfa+ dpa_pfa+ dha_pfa,
          omega3_noala_pfa= epa_pfa+ dpa_pfa+ dha_pfa,
          omega6_pfa = P1+P2+P5+ P6+ P8+P9+P12)
+
+
 #get first 6 number of ID1 which stands for id in idkey file
 
 #### Merge and get individual metadata 
-metadata_dbp<- left_join(metadata_db, plasma, by ="ID1")
+metadata_dbp<- left_join(metadata_db, pfa, by ="ID1")
 
+metadata_dbp$calor_fs_dr_ddr
 
 
 
 ### 4) metadata of interest ####
 basic <-   c('ID1_stn', 'ID1', 'phase',
            'agemlvs', 'bmi10', 'bmi12', 'wt10', 'wt12', 'smoke10', 'smk12', 'ncig12', 'bmic10', 'bmic12', 'bmi12cat', 'smoke12', 
-           'calor10n', 'alco10n', 'calor10v', 'calor_avg', 'alco_avg', 'abx_avg', 'probx_avg', 'alc_avg', 'bristol', 'bristolcat', 'bristol_avg', 'bristolcat_avg',
-           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr' )
+           'calor10n', 'alco10n', 'calor10v', 
+           'calor_avg', 'alco_avg', 'abx_avg', 'probx_avg', 'alc_avg', 'bristol', 'bristolcat', 'bristol_avg', 'bristolcat_avg',
+           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr', calor_fs_dr_ddr,  )
 # smoke12 is ordinal
 exposure_long <- c('ala10v', 'epa10v', 'dha10v', 'trans10v', 'omega610v', 'omega3_noala10a', 'dpa10v', 'omega310v', 'omega3_noala10v')
 exposure_avg <- c('ala_avg', 'epa_avg', 'dpa_avg', 'trans_avg', 'omega3_avg', 'omega6_avg', 'omega3_noala_avg', 'fishavg')
@@ -314,11 +322,13 @@ outcome_plasma <- c('folate_plasma', 'tc_plasma', 'hdlc_plasma', 'tg_plasma', 'c
 outcome_pfa <- c('ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 
                 'AA_pfa' = 'P8', 
                 'omega3_pfa','omega3_noala_pfa','omega6_pfa')
+outcome_logpfa <- c('logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 
+                    'logAA_pfa' = 'logP8', 
+                    'logomega3_pfa','logomega3_noala_pfa','logomega6_pfa')
 
 metadata_intrst <- metadata_dbp %>%
   select(basic, exposure_long, exposure_avg, exposure_1yr, exposure_short,
          outcome_plasma, outcome_pfa)
-
 
 
 
@@ -334,12 +344,32 @@ for (i in 1:ncol(metadata_intrst)){
   }
 }
 
+#metadata_intrst <- tibble::column_to_rownames(metadata_intrst, var = "ID1_stn")
+
+
+#### Make log ######
+for_log <- metadata_intrst
+for_log <- for_log %>% 
+  dplyr::select(where(is.numeric))
+
+for_log <- for_log[, colSums(for_log, na.rm = T)!=0]
+
+for (i in 1:ncol(for_log)){
+  a<-for_log[,i]
+  for (j in 1:nrow(for_log)){
+    if (for_log[j,i]<=0){for_log[j,i]<- min(a[a > 0])}
+  }
+}
+
+
+logmeta <- log(for_log[,-1])
+colnames(logmeta) <- paste("log", colnames(for_log[,-1]), sep = "")
+logmeta <- cbind("ID1_stn" = metadata_intrst$ID1_stn, "ID1" = metadata_intrst$ID1, logmeta)
+
+totmeta <- cbind(metadata_intrst, logmeta[,-c(1:2)])
+
 
 ###DONE!!!!!!!!!!!!!!!!!!
-
-
-
-
 
 
 
@@ -347,38 +377,17 @@ for (i in 1:ncol(metadata_intrst)){
 ##### metadata by stool ####
 
 
-write.table(meta_stn, file = "data/meta_stn.tsv", sep = "\t", col.names = TRUE, row.names = TRUE)
-
+write.table(metadata_intrst, file = "./data/meta_stn.pcl",  sep = '\t', quote = F, eol = '\n',  row.names=F)
+write.table(logmeta, file = "./data/logmeta_stn.pcl",  sep = '\t', quote = F, eol = '\n',  row.names=F)
+write.table(totmeta, file = "./data/totmeta_stn.pcl",  sep = '\t', quote = F, eol = '\n',  row.names=F)
 
 ########## DICTIONARY #############
 
+##How to import?
+species <-read.table(file = './data/species_filt.csv',
+                     sep = ',',  row.names = 1,  header = TRUE,   check.names = FALSE)
 
-
-
-# read in taxonomy data
-
-#View(ttax_rpk)
-
-
-meta_species_nona<-merge(meta_stn, species_filt, by=0, rownames = TRUE)
-rownames(meta_species_nona) <- meta_species_nona$Row.names
-
-write.csv(meta_species_nona, file="./data/meta_species_nona.csv")
-
-meta_stn_nona <- meta_species_nona %>% select(c(colnames(meta_stn)))
-species_nona <- meta_species_nona %>% select(c(colnames(species_filt)))
-rownames(meta_stn_nona) <- rownames(meta_species_nona)
-rownames(species_nona) <- rownames(meta_species_nona)
-
-
-write.csv(meta_stn_nona, file="./data/meta_stn_nona.csv")
-write.csv(species_nona, file="./data/species_nona.csv")
-
-meta_species_nona$smoke12
-
-
-library(haven)
-sas <- read_sas("./data/mlvs_meta_data.sas")
-
-
+meta_stn <- read.table('./data/meta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
+logmeta_stn <- read.table('./data/logmeta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
+totmeta_stn <- read.table('./data/totmeta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
 
