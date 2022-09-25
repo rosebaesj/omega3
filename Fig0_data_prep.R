@@ -295,7 +295,7 @@ pfa <- pfa %>%
 #### Merge and get individual metadata 
 metadata_dbp<- left_join(metadata_db, pfa, by ="ID1")
 
-metadata_dbp$calor_fs_dr_ddr
+metadata_dbp$omega310v
 
 
 
@@ -304,7 +304,7 @@ basic <-   c('ID1_stn', 'ID1', 'phase',
            'agemlvs', 'bmi10', 'bmi12', 'wt10', 'wt12', 'smoke10', 'smk12', 'ncig12', 'bmic10', 'bmic12', 'bmi12cat', 'smoke12', 
            'calor10n', 'alco10n', 'calor10v', 
            'calor_avg', 'alco_avg', 'abx_avg', 'probx_avg', 'alc_avg', 'bristol', 'bristolcat', 'bristol_avg', 'bristolcat_avg',
-           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr', calor_fs_dr_ddr,  )
+           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr', 'calor_fs_dr_ddr'  )
 # smoke12 is ordinal
 exposure_long <- c('ala10v', 'epa10v', 'dha10v', 'trans10v', 'omega610v', 'omega3_noala10a', 'dpa10v', 'omega310v', 'omega3_noala10v')
 exposure_avg <- c('ala_avg', 'epa_avg', 'dpa_avg', 'trans_avg', 'omega3_avg', 'omega6_avg', 'omega3_noala_avg', 'fishavg')
@@ -314,7 +314,8 @@ exposure_short <- c( 'ala_ddr' = 'a_ala_fs_dr_ddr',
                      'dpa_ddr' = 'a_p22_5_fs_dr_ddr',
                      'omega3_noala_ddr' = 'a_omega3_noala_fs_dr_ddr',
                      'omega3_ddr' = 'a_omega3_fs_dr_ddr',
-                        'a_fat_fs_dr_ddr')
+                        'fat' = 'a_fat_fs_dr_ddr')
+
 exposure_1yr <- c('ala_ffq', 'epa_ffq', 'dpa_ffq', 'dha_ffq', 'omega3_ffq', 'omega6_ffq', 'omega3_noala_ffq', 'omega_3_epa_ffq',
                   'tuna_ffq', 'dk_fish_ffq', 'oth_fish_ffq','fishffq')
 outcome_plasma <- c('folate_plasma', 'tc_plasma', 'hdlc_plasma', 'tg_plasma', 'crp_plasma',  'crp_plasmacat', 'tchdl_plasma', 

@@ -355,3 +355,5 @@ al4<-out_rings_alpha(path="./maaslin_results/logcrp_plasma.pcl/significant_resul
 alall<-rbind(al1, al2, al3, al4)
 write.table(alall, "./data/out_rings_alpha.txt", 
             sep="\t", quote = FALSE, col.names = F, row.names = F)
+write.table(all_species_name, "./data/all_species_name.txt", 
+            sep=".", quote = FALSE, col.names = F, row.names = F)
