@@ -1,4 +1,17 @@
+species <-read.table(file = './data/species_filt.csv',
+                     sep = ',',  row.names = 1,  header = TRUE,   check.names = FALSE)
 
+meta_stn <- read.table('./data/meta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
+
+totmeta_stn <- read.table('./data/totmeta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
+
+
+logspecies <-read.table(file = './data/logspecies_filt.pcl', row.names = 1,  header = TRUE, sep='\t',  check.names = FALSE, quote ="")
+bispecies <- read.table('./data/bispecies_filt.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
+
+
+meta_logspecies <- merge(totmeta_stn, logspecies, by = 0)
+meta_bispecies <- merge(totmeta_stn, bispecies, by = 0)
 
 #### Correlation analysis ####
 
@@ -14,16 +27,25 @@ meta_species$'Plasma_CRP' <- meta_species$logcrp_w1
 meta_species$'Plasma_HDL' <- meta_species$loghdl_w1
 meta_species$'Plasma_TG' <- meta_species$logtg_w1
 
-list <- c('Age', 
-          'BMI', 
-          'Calory_intake', 
-          'Plasma_CRP', 
-          'Plasma_HDL', 
-          'Plasma_TG')
+list <- c('agemlvs', 'bmi12', 'logcrp_plasma',
+          'omega3_noala_ddr', 'epa_ddr', 'dpa_ddr', 'dha_ddr', 'ala_ddr', 'omega3_ddr',
+          'omega3_noala_ffq','epa_ffq', 'dpa_ffq', 'dha_ffq','ala_ffq','omega3_ffq',
+          'omega3_noala10v','epa10v', 'dpa10v', 'dha10v','ala10v','omega310v',
+          'omega3_noala_pfa','epa_pfa', 'dpa_pfa', 'dha_pfa', 'ala_pfa','omega3_pfa'
+)
+
+corrmat <- totmeta_stn[,c('agemlvs', 'bmi12', 
+                          'logcrp_plasma',
+                          'omega3_noala_ddr', #'epa_ddr', 'dpa_ddr', 'dha_ddr', 'ala_ddr', 'omega3_ddr',
+                          'omega3_noala_ffq',#'epa_ffq', 'dpa_ffq', 'dha_ffq','ala_ffq','omega3_ffq',
+                          'omega3_noala10v',#'epa10v', 'dpa10v', 'dha10v','ala10v','omega310v',
+                          'omega3_noala_pfa')]#,'epa_pfa', 'dpa_pfa', 'dha_pfa', 'ala_pfa','omega3_pfa')]
+totmeta_stn$omega3noala_
 
 pawt_data <- subset(meta_species, select=list)
 
-cormat <- rcorr(as.matrix(pawt_data),type=c("spearman"))
+cormat <- rcorr(as.matrix(corrmat),type=c("spearman"))
+
 cormat
 rcx <- cormat
 str(rcx)

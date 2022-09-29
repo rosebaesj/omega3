@@ -36,13 +36,20 @@ species <-read.table(file = './data/species_filt.csv',
 exposures <- c('omega3_ddr', 'ala_ddr','epa_ddr' ,'dpa_ddr' ,'dha_ddr', 'omega3_noala_ddr' , 
               'omega310v', 'ala10v', 'epa10v', 'dpa10v', 'dha10v', 'omega3_noala10v')
 
+exposures_ffq <- c('omega3_ddr', 'ala_ddr','epa_ddr' ,'dpa_ddr' ,'dha_ddr', 'omega3_noala_ddr' , 
+                   'omega3_ffq', 'ala_ffq','epa_ffq' ,'dpa_ffq' ,'dha_ffq', 'omega3_noala_ffq' , 
+               'omega310v', 'ala10v', 'epa10v', 'dpa10v', 'dha10v', 'omega3_noala10v')
+
+
+
+
 logexposures <- paste('log', exposures, sep = "")
 
 outcomes <- c('logcrp_plasma', 'loghdl_plasma', 'logtc_plasma', 'logtg_plasma', 
-              'AA_pfa', 'ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 
-              'logAA_pfa', 'logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa')
+              'AA_pfa', 'ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 'omega3_pfa',
+              'logAA_pfa', 'logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 'logomega3_noala_pfa')
 
-
+adjust <- c('ala', 'epa', 'dpa', 'dha','omega3','omega3_noala','omega6')
 
 ### get significant results ###
 
@@ -126,6 +133,7 @@ plot_maaslin <- function(listofmeta, by = by){
 }
 
 
+
 ### A) exposures ####
 bind_exp <- plot_maaslin(exposures, by = 'omega3_ddr')
 
@@ -192,6 +200,61 @@ ggplot(data = NULL, aes(species$s__Eubacterium_rectale, totmeta_stn$dpa_ddr))+
   geom_point()
 
 
+### d) exposure with ffq ####
+bind_ffq <- plot_maaslin(exposures_ffq, by = 'logcrp_plasma')
+
+ggplot(bind_ffq, aes(meta, name)) +
+  geom_tile(aes(fill = coef), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+  xlab("plasma outcomes") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+ggplot(data = NULL, aes(species$s__Eubacterium_rectale, totmeta_stn$dpa_ddr))+
+  geom_point()
+
+
+bind_ffq <- plot_maaslin(c('omega3_noala_ddr', 'epa_ddr', 'dpa_ddr', 'dha_ddr',
+                           'omega3_noala_ffq', 'epa_ffq', 'dpa_ffq', 'dha_ffq',
+                           'omega3_noala10v', 'epa10v', 'dpa10v', 'dha10v',
+                           'logcrp_plasma'), by = 'logcrp_plasma')
+
+bind_ffq <- plot_maaslin(c('logomega3_noala_ddr', 
+                           'logomega3_noala_ffq', 
+                           'logomega3_noala10v', 
+                           'logcrp_plasma'), by = 'logcrp_plasma')
+
+ggplot(bind_ffq, aes(meta, name)) +
+  geom_tile(aes(fill = coef), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+  xlab("plasma outcomes") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+ggplot(data = NULL, aes(species$s__Eubacterium_rectale, totmeta_stn$dpa_ddr))+
+  geom_point()
+
+
+
+
+
+
 ### e)  ####
 
 list_maaslin <- c('logomega3_ddr', 'logala_ddr','logepa_ddr' ,'logdpa_ddr' ,'logdha_ddr', 'logomega3_noala_ddr' , 
@@ -231,6 +294,141 @@ ggplot(bind_list, aes(meta, name))+
         axis.text.x = element_text(angle = 45, hjust = 1, size=10,colour="white")) +
   labs(fill = "Phyla")
 
+
+
+
+
+
+
+####***adjusted****#
+
+
+bind_adj <- plot_maaslin(adjust, by = 'adjust')
+
+sig_results_adj<- function(exposure){
+  dir = paste('./maaslin_results/adjusted_', exposure, '.pcl/significant_results.tsv',sep='')
+  result<-read.table(file = dir, sep = '\t', header = TRUE, check.names=FALSE)
+  sig_result <- subset(result, metadata==paste(exposure,'_pfa',sep=''), select =c(feature, metadata))
+  return(sig_result)
+}
+
+all_results_adj <- function(exposure, label){
+  dir = paste('./maaslin_results/adjusted_', exposure, '.pcl/all_results.tsv',sep='')
+  result<-read.table(file =dir, sep = '\t', header = TRUE, check.names=FALSE)
+  all_result <- subset(result, metadata==paste(exposure,'_pfa',sep=''), select =-c(value, N))
+  all_result$meta <- label
+  return(all_result)
+}
+
+
+  join <- sig_results_adj(adjust[1])
+  for (i in 2:length(adjust)) {
+    join<-full_join(join, sig_results_adj(adjust[i]), by="feature")
+  }
+  sigf_exp<-subset(join, select=feature)
+  
+  bind <- left_join(sigf_exp, all_results_adj(adjust[1], label = paste(adjust[1], "l", sep = "")), by="feature")
+  for (i in 2:length(adjust)) {
+    bind <- rbind(bind, left_join(sigf_exp, all_results_adj(adjust[i], label = paste(adjust[i], "l", sep = "")), by="feature"))
+  }
+  
+  bind<-left_join(bind, all_species_name, by="feature")
+  
+  bind$feature <- substring(bind$feature, 4)
+  bind$phylum <- substring(bind$phylum, 4)
+  
+  bind<-bind[order(bind$meta, bind$phylum, bind$feature),]
+  vector <- bind %>%
+    arrange(feature) %>% arrange(genus) %>% arrange(family) %>% arrange(order) %>% arrange(class) %>% arrange(phylum) %>% arrange(kingdom) %>% arrange(meta) %>%
+    slice(1:(nrow(bind)/length(adjust)))
+  
+  rownames(bind) <- 1:nrow(bind)
+  
+  bind$stars <- cut(bind$qval, breaks=c(-Inf, 0.01, 0.05, 0.1, 0.25, Inf), label=c("****", "***", "**", "*", ""))
+  
+  bind$feature <- factor(bind$feature, levels = vector$feature)
+  bind$meta <- factor(bind$meta, level = paste(adjust, "l", sep = ""))
+  bind$name<-gsub("[^[:alnum:][:blank:]+?&/\\-]", " ", bind$feature) ## without underbar
+  bind$name <- factor(bind$name, levels = bind$name[1:(nrow(bind)/length(adjust))])
+  
+
+bind_adj<- bind
+
+ggplot(bind_adj, aes(meta, name)) +
+  geom_tile(aes(fill = coef), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+  xlab("corr. with plasmic FA, adjusted for FA intake") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+ggplot(data = NULL, aes(species$s__Eubacterium_rectale, totmeta_stn$dpa_ddr))+
+  geom_point()
+
+#####
+
+outcomes <- c('logcrp_plasma', 'loghdl_plasma', 'logtc_plasma', 'logtg_plasma', 
+              'AA_pfa', 'ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 'omega3_pfa',
+              'logAA_pfa', 'logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 'logomega3_noala_pfa')
+
+pfa <- c('ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 'omega3_pfa','omega3_noala_pfa','omega6_pfa')
+
+bind_pfa <- plot_maaslin(pfa, by = 'logcrp_plasma')
+
+ggplot(bind_pfa, aes(meta, name)) +
+  geom_tile(aes(fill = coef), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+  xlab("") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+
+bindbind <- rbind(bind_pfa, bind_adj)
+ggplot(bindbind, aes(meta, name)) +
+  geom_tile(aes(fill = coef), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+  xlab("") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##### ) graphlan ####
 list_graphlan <- c('logomega3_ddr', 'logomega3_noala_ddr' , 
                    'logAA_pfa', 'logcrp_plasma')
@@ -251,6 +449,33 @@ ggplot(bind_graph, aes(meta, name)) +
         axis.text.y=element_text(size=10, face="italic",color="black"),
         axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
   labs(fill = "Beta coefficient")
+
+
+####### adjusted #####
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##### GraPhlan #####
 

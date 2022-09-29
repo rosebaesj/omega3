@@ -22,6 +22,9 @@ library(ggpubr)
 library(tidyverse)
 library(gridExtra)
 library(colourvalues)
+library(lme4)
+library(lmerTest)
+
 
 ### IMPORT DATA #####
 ##### + with NAs ####
@@ -33,59 +36,236 @@ meta_stn <- read.table('./data/meta_stn.pcl',row.names = 1, header=TRUE, sep='\t
 totmeta_stn <- read.table('./data/totmeta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
 
 
+
+
+logspecies <-read.table(file = './data/logspecies_filt.pcl', row.names = 1,  header = TRUE, sep='\t',  check.names = FALSE, quote ="")
+bispecies <- read.table('./data/bispecies_filt.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
+
+
+meta_logspecies <- merge(totmeta_stn, logspecies, by = 0)
+meta_bispecies <- merge(totmeta_stn, bispecies, by = 0)
+
+## TOP 20 
+order_species <- species [,rev(order(colSums(species)))]
+top20 <- colnames(order_species[,1:20])
+top50 <- colnames(order_species[,1:50])
+order_species[,1:20]
+
+list <- c('logomega3_noala_ddr' , 
+                   'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 
+                  'logAA_pfa', 'logcrp_plasma')
+
+list <- c('logomega3_ddr', 'logala_ddr','logepa_ddr' ,'logdpa_ddr' ,'logdha_ddr', 'logomega3_noala_ddr' , 
+  'logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 
+  'logAA_pfa', 'logcrp_plasma', 'loghdl_plasma', 'logtc_plasma', 'logtg_plasma')
+
 # scatterplot with x-axis of s__Alistipes_putredinis and y-axis of tdee_pam colored by bmi_dlw
+meta_species$omega3_noala_avg
 
-ggplot(ttax_rel, aes(s__Alistipes_putredinis.y, paee_pamwk)) + geom_point(aes(color = bmi_dlw),size=20, alpha=0.8, position = position_jitter()) + 
-  scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
-  xlab(expression(paste('Relative abundance of',italic("A. putredinis"), '(log10 scale)')))+
-  ylab("Recent total PA (MET-hours/week)")+theme_classic()+
-  theme(legend.position="right",
-        axis.line = element_line(colour = "black", 
-                                 size = 2, linetype = "solid"),
-        legend.text = element_text(size=80),
-        legend.title = element_blank(),
-        axis.text.y=element_text(color = "Black",size=80),
-        axis.text.x=element_text(color = "Black",size=80),
-        axis.title.y=element_text(color = "Black",size=80),
-        axis.title.x=element_blank())
+for (i in 1:20){
+  for(j in 1:length(list)){
+    
+    a<- ggplot(meta_species, aes(meta_species[,top20[i]], meta_species[,list[j]])) + 
+      geom_point(aes(color = logcrp_plasma),size=2, alpha=0.8)+#, position = position_jitter()) + 
+      scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
+      xlab(paste('Relative abundance of ',top20[i], ' (log scale)'))+
+      ylab(paste(list[j]))+theme_classic()+
+      theme(legend.position="right",
+            axis.line = element_line(colour = "black", 
+                                     size = 1, linetype = "solid"),
+            legend.text = element_text(size=10),
+            legend.title = element_blank(),
+            axis.text.y=element_text(color = "Black",size=10),
+            axis.text.x=element_text(color = "Black",size=10),
+            axis.title.y=element_text(color = "Black",size=10),
+            axis.title.x=element_text(color = "Black",size=10))
+    png(file=paste("figure_generated/scatter_top20/", top20[i], "_", list[j], ".png"),
+        width=5,height=4, units="in", res = 1000)
+    grid.arrange(a, ncol=1, nrow=1)
+    dev.off()
+  }
+}
 
-# scatterplot with x-axis of s__Alistipes_putredinis and y-axis of tdee_pam colored by pfat_dlw
-png(file="./figure_generated/pa_pfat_Alistipes.png",width=2000,height=2000, pointsize=80)
-ggplot(ttax_rel, aes(s__Alistipes_putredinis.y, paee_pamwk)) + geom_point(aes(color = pfat_dlw),size=20, alpha=0.8, position = position_jitter()) + 
-  scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
-  xlab("Abundance of Alistipes putredinis")+
-  ylab("Recent total PA (MET-hours/week)")+theme_classic()+
-  theme(legend.position="right",
-        axis.line = element_line(colour = "black", 
-                                 size = 2, linetype = "solid"),
-        legend.text = element_text(size=80),
-        legend.title = element_blank(),
-        axis.text.y=element_text(color = "Black",size=80),
-        axis.text.x=element_text(color = "Black",size=80),
-        axis.title.y=element_text(color = "Black",size=80),
-        axis.title.x=element_text(color = "Black",size=80))
-dev.off()
 
-# scatterplot with x-axis of s__Alistipes_putredinis and y-axis of act_paqlong colored by wtchgsto21
-#"#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"
-#"#98ff98","#7be27d","#5fc663","#41aa4a","#005b00","#004200","#002d00","#000d00"
-#colour_values(1:10, n_summaries = 6)
-#df <- data.frame(a = 10, x = 1:10)
-#df$col <- colour_values(-df$x, palette = "viridis")
-png(file="./figure_generated/pa_sec_wtchgsto21_Alistipes.png",width=2000,height=2000, pointsize=80)
-ggplot(ttax_rel, aes(s__Alistipes_putredinis.y, act_paqlong_sec)) + geom_point(aes(color = wtchgsto21),size=20, alpha=0.8, position = position_jitter()) + 
-  scale_color_gradientn(colours = c("#FDE725FF", "#B4DD2CFF","#5DC963FF","#21908CFF","#3B528BFF","#482878FF","#440154FF"))+
-  ylim(0, 90)+
-  xlab(expression(paste('Relative abundance of',italic("A. putredinis"), '(log10 scale)')))+
-  ylab("Long-term PA (MET-hours/week)")+theme_classic()+
-  theme(legend.position="right",
+for (i in 1:20){
+  for(j in 1:length(list)){
+    
+    a<- 
+      ggplot(meta_species, aes(meta_species[,top20[i]], meta_species[,list[j]])) + 
+      geom_point(aes(color = logomega3_noala_ddr),size=2, alpha=0.8)+#, position = position_jitter()) + 
+      scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
+      xlab(paste('Relative abundance of ',top20[i], ' (log scale)'))+
+      ylab(paste(list[j]))+
+      theme_classic()+
+      labs(title = paste("P_interaction = ", round(p, digits = 5)))+
+      theme(plot.title = element_text(color = "Black",size=10, hjust = 0),
+            legend.position="right",
+            axis.line = element_line(colour = "black", 
+                                     size = 1, linetype = "solid"),
+            legend.text = element_text(size=10),
+            legend.title = element_text(color = "Black",size=10),
+            
+            axis.text.y=element_text(color = "Black",size=10),
+            axis.text.x=element_text(color = "Black",size=10),
+            axis.title.y=element_text(color = "Black",size=10),
+            axis.title.x=element_text(color = "Black",size=10))
+    png(file=paste("figure_generated/scatter_top20_omega3/", top20[i], "_", list[j], ".png"),
+        width=5,height=4, units="in", res = 1000)
+    grid.arrange(a, ncol=1, nrow=1)
+    dev.off()
+  }
+}
+
+#logcrp ~ bug*omega3_noala-ddr
+for (i in 1:20){
+  reg<- lmer(formula = logcrp_plasma ~  meta_species[,which( colnames(meta_species)==top20[i] )]*logomega3_noala_ddr +
+               agemlvs+calor_fs_dr_ddr+probx_ddr+abx_ddr+bristol_ddr+ smoke12 + (1 | ID1), 
+             data=meta_species)
+  an<- anova(reg)
+  p<- y[nrow(an), ncol(an)]
+  
+    a<- 
+      ggplot(meta_species, aes(meta_species[,top20[i]], meta_species[,list[j]])) + 
+      geom_point(aes(color = logcrp_plasma),size=2, alpha=0.8)+#, position = position_jitter()) + 
+      scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
+      xlab(paste('Relative abundance of ',top20[i], ' (log scale)'))+
+      ylab(paste(list[j]))+
+      theme_classic()+
+      labs(title = paste("P_interaction = ", p))+
+      theme(plot.title = element_text(color = "Black",size=10, hjust = 0),
+            legend.position="right",
+            axis.line = element_line(colour = "black", 
+                                     size = 1, linetype = "solid"),
+            legend.text = element_text(size=10),
+            legend.title = element_text(color = "Black",size=10),
+            
+            axis.text.y=element_text(color = "Black",size=10),
+            axis.text.x=element_text(color = "Black",size=10),
+            axis.title.y=element_text(color = "Black",size=10),
+            axis.title.x=element_text(color = "Black",size=10))
+    png(file=paste("figure_generated/scatter_top20_P/", top20[i], "_", "logomega3_noala_ddr","_", "logcrp", ".png", sep =""),
+        width=5,height=4, units="in", res = 1000)
+    grid.arrange(a, ncol=1, nrow=1)
+    dev.off()
+
+}
+
+
+# AA ~ bug*omega
+
+lmer(formula = logAA_pfa ~  meta_bispecies[,top20[i]]+meta_bispecies[,list[j]] +meta_bispecies[,top20[i]]*meta_bispecies[,list[j]]
+     +agemlvs+abx_ddr+probx_ddr+bristol_ddr+ smoke12 +calor_fs_dr_ddr 
+     +(1 | ID1), 
+     data=meta_bispecies)
+
+
+
+
+
+
+
+meta_species$logAA_pfa
+for (j in 1:length(list)){
+  j=6
+  i=18
+  while (i <= 20){
+    reg<- lmer(formula = logAA_pfa ~  meta_bispecies[,top20[i]]+meta_bispecies[,list[j]] +meta_bispecies[,top20[i]]*meta_bispecies[,list[j]]
+               +agemlvs+abx_ddr+probx_ddr+bristol_ddr+ smoke12 +calor_fs_dr_ddr 
+               +(1 | ID1), 
+               data=meta_bispecies)
+    an<- anova(reg)
+    p<- an[nrow(an), ncol(an)]
+    
+    a<- 
+      ggplot(meta_species, aes(meta_species[,top20[i]], meta_species[,list[j]])) + 
+      geom_point(aes(color = logAA_pfa),size=2, alpha=0.8)+#, position = position_jitter()) + 
+      scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
+      xlab(paste('Relative abundance of ',top20[i], ' (log scale)'))+
+      ylab(paste(list[j]))+
+      theme_classic()+
+      labs(title = paste("P_interaction = ", p))+
+      theme(plot.title = element_text(color = "Black",size=10, hjust = 0),
+            legend.position="right",
+            axis.line = element_line(colour = "black", 
+                                     size = 1, linetype = "solid"),
+            legend.text = element_text(size=10),
+            legend.title = element_text(color = "Black",size=10),
+            
+            axis.text.y=element_text(color = "Black",size=10),
+            axis.text.x=element_text(color = "Black",size=10),
+            axis.title.y=element_text(color = "Black",size=10),
+            axis.title.x=element_text(color = "Black",size=10))
+    png(file=paste("figure_generated/scatter_top20_logAA_bi/", top20[i], "_", list[j],"_", "logAA_pfa", ".png", sep =""),
+        width=5,height=4, units="in", res = 1000)
+    grid.arrange(a, ncol=1, nrow=1)
+    dev.off()  
+    i = i+1
+  }
+}
+
+
+
+meta_species$logAA_pfa
+for (j in 1:length(list)){
+  j=1
+  i=7
+  while (i <= 20){
+    reg<- lmer(formula = logAA_pfa ~  meta_species[,top20[i]]+meta_species[,list[j]] +meta_species[,top20[i]]*meta_species[,list[j]]
+               +agemlvs+abx_ddr+probx_ddr+bristol_ddr+ smoke12 +calor_fs_dr_ddr 
+               +(1 | ID1), 
+               data=meta_species)
+    an<- anova(reg)
+    p<- an[nrow(an), ncol(an)]
+    
+    a<- 
+      ggplot(meta_species, aes(meta_species[,top20[i]], meta_species[,list[j]])) + 
+      geom_point(aes(color = logAA_pfa),size=2, alpha=0.8)+#, position = position_jitter()) + 
+      scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff", "#2d708eff", "#440154ff"))+
+      xlab(paste('Relative abundance of ',top20[i], ' (log scale)'))+
+      ylab(paste(list[j]))+
+      theme_classic()+
+      labs(title = paste("P_interaction = ", p))+
+      theme(plot.title = element_text(color = "Black",size=10, hjust = 0),
+            legend.position="right",
+            axis.line = element_line(colour = "black", 
+                                     size = 1, linetype = "solid"),
+            legend.text = element_text(size=10),
+            legend.title = element_text(color = "Black",size=10),
+            
+            axis.text.y=element_text(color = "Black",size=10),
+            axis.text.x=element_text(color = "Black",size=10),
+            axis.title.y=element_text(color = "Black",size=10),
+            axis.title.x=element_text(color = "Black",size=10))
+    png(file=paste("figure_generated/scatter_top20_logAA/", top20[i], "_", list[j],"_", "logAA_pfa", ".png", sep =""),
+        width=5,height=4, units="in", res = 1000)
+    grid.arrange(a, ncol=1, nrow=1)
+    dev.off()  
+    i = i+1
+  }
+}
+
+
+
+ggplot(meta_logspecies, aes(meta_logspecies[,"s__Roseburia_faecis"], meta_logspecies[,"logala_ddr"])) + 
+  geom_point(aes(color = logcrp_plasma),size=2, alpha=0.8)+#, position = position_jitter()) + 
+  scale_color_gradientn(colours = c("#fde725ff",  "#dce319ff","#b8de29ff","#29af7fff","#29af7fff", "#2d708eff", "#2d708eff","#440154ff","#440154ff", "#440154ff"))+
+  xlab(paste('Relative abundance of s__Roseburia_faecis (log scale)'))+
+  ylab(paste("logomega3_noala_pfa"))+
+  theme_classic()+
+  labs(title = paste("P_interaction = "))+
+  theme(plot.title = element_text(color = "Black",size=10, hjust = 0),
+        legend.position="right",
         axis.line = element_line(colour = "black", 
-                                 size = 2, linetype = "solid"),
-        legend.text = element_text(size=80),
-        legend.title = element_blank(),
-        axis.text.y=element_text(color = "Black",size=80),
-        axis.text.x=element_text(color = "Black",size=80),
-        axis.title.y=element_text(color = "Black",size=80),
-        axis.title.x=element_blank())
-dev.off()
+                                 size = 1, linetype = "solid"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(color = "Black",size=10),
+        
+        axis.text.y=element_text(color = "Black",size=10),
+        axis.text.x=element_text(color = "Black",size=10),
+        axis.title.y=element_text(color = "Black",size=10),
+        axis.title.x=element_text(color = "Black",size=10))
+
+
+
+
 

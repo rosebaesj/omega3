@@ -8,45 +8,7 @@
 # 6) Follow-up: 2012 (Men's Lifestyle Validation Study)  
 #############################################################################################################################################
 
-rm(list=ls())
-getwd()
-setwd("./noGit")
-options(max.print=1000000)
 
-library(viridis)
-library(ggplot2)
-library(grid)
-library(tidyverse)
-library(cowplot)
-library(data.table)
-library(readr)
-library(haven)
-library(plyr)
-library(dplyr)
-library(vegan)
-library(scales)
-library(RColorBrewer)
-library(grid)
-library(pheatmap)
-library(lme4)
-library(ggplot2)
-library(cowplot)
-library(ggsignif)
-library(car)
-library(Maaslin2)
-library(gridExtra)
-library(knitr)
-library(readxl)
-library(ggpubr)
-library(tidyverse)
-library(vegan)
-library(RColorBrewer)
-library(viridis)
-library("Hmisc")
-library(reshape2)
-library(expss)
-library(sjmisc)
-source("Rstart.R")
 
 
 ###### DATA PREPARATION ########
@@ -84,6 +46,11 @@ all_sample <- colnames(all_species1)
 # remove guy with colectomy 
 all_species1 <- all_species1[ , !colnames(all_species1) %in% c(grep("15074981", colnames(all_species1), value = T))]
 
+# check NA
+sum(colSums(is.na(all_species1)))
+#0 -> no 
+
+
 
 # generate list of species after abundance/prevalence filtering
 # since this file is scaled to 100, i am keeping bugs with >10% prevalence and 0.01 abundance (i.e. .0001*100 when relab is scaled 0-1 and not 0-100)
@@ -111,8 +78,6 @@ species_filt <- all_species_filt[,!colnames(all_species_filt) %in% c('ID1','stn'
 write.table(species_filt, file = "./data/species_filt.csv", sep = ",", col.names = TRUE, row.names = TRUE)
 
 
-meta_id$tfat_avg
-
 
 
 
@@ -126,6 +91,38 @@ meta_id <- read.table("data/mlvs_exposure_for_jorick.txt", header=TRUE, sep='\t'
 idkey <- read.csv('data/idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
 rownames(idkey) <- idkey$id
 meta_id<- left_join(idkey, meta_id, by="id")
+
+# missing1 <- is.na(meta_id[,c('logcrp_plasma1', 'a_omega3_fs_dr_w1', 'a_f205_fs_dr_w1', 'a_f226_fs_dr_w1', 'a_p22_5_fs_dr_w1',
+#                             'omega3_noala_ffq1', 'epa_ffq1', 'dpa_ffq1', 'dha_ffq1',
+#                             'omega3_noala10v', 'epa10v', 'dpa10v', 'dha10v'
+#                             ) ])
+# # colSums(missing1)
+# sum(rowSums(missing1)!=0)
+# missing2 <- is.na(meta_id[,c('logcrp_plasma2', 'a_omega3_fs_dr_w2', 'a_f205_fs_dr_w2', 'a_f226_fs_dr_w2', 'a_p22_5_fs_dr_w2',
+#                              'omega3_noala_ffq2', 'epa_ffq2', 'dpa_ffq2', 'dha_ffq2',
+#                              'omega3_noala10v', 'epa10v', 'dpa10v', 'dha10v') ])
+# colSums(missing2)
+# sum(rowSums(missing2)!=0)
+# 
+# missing <- cbind(missing1, missing2)
+# colSums(missing)
+# sum(rowSums(missing)!=0)
+# 
+# colSums(is.na(meta_id[,c('logcrp_plasma1', 'a_omega3_fs_dr_w1', 'a_f205_fs_dr_w1', 'a_f226_fs_dr_w1', 'a_p22_5_fs_dr_w1') ]))
+# sum(is.na(meta_id$logcrp_plasma1 )|is.na(meta_id$a_omega3_fs_dr_w1)|is.na(meta_id$a_f205_fs_dr_w1)|is.na(meta_id$a_f226_fs_dr_w1)|is.na(meta_id$a_p22_5_fs_dr_w1))
+# 
+# colSums(is.na(meta_id[,c('logcrp_plasma2', 'a_omega3_fs_dr_w2', 'a_f205_fs_dr_w2', 'a_f226_fs_dr_w2', 'a_p22_5_fs_dr_w2') ]))
+# sum(is.na(meta_id$logcrp_plasma2 )|is.na(meta_id$a_omega3_fs_dr_w2)|is.na(meta_id$a_f205_fs_dr_w2)|is.na(meta_id$a_f226_fs_dr_w2)|is.na(meta_id$a_p22_5_fs_dr_w2))
+# 
+# colSums(is.na(meta_id[,c('logcrp_plasma1', 'omega3_noala_ffq1', 'epa_ffq1', 'dpa_ffq1', 'dha_ffq1') ]))
+# sum(is.na(meta_id$logcrp_plasma1 )|is.na(meta_id$omega3_noala_ffq1)|is.na(meta_id$epa_ffq1)|is.na(meta_id$dpa_ffq1)|is.na(meta_id$dha_ffq1))
+# 
+# colSums(is.na(meta_id[,c('logcrp_plasma1', 'a_omega3_fs_dr_w2', 'epa_ffq1', 'dpa_ffq1', 'dha_ffq1') ]))
+# sum(is.na(meta_id$logcrp_plasma1 )|is.na(meta_id$omega3_noala10v)|is.na(meta_id$epa_ffq1)|is.na(meta_id$dpa_ffq1)|is.na(meta_id$dha_ffq1))
+
+
+
+
 
 
 #### + set Phase #####
@@ -145,17 +142,17 @@ colnames(phase2) <- str_replace_all(colnames(phase2),  c("_w2" = "_ddr", "ffq2" 
 
 ##### missing data ####
 dim(phase1)==dim(phase2)
-
-for (i in 1:ncol(phase1)){
-  for (j in 1:nrow(phase1)){
-    if (is.na(phase1[j,i])){phase1[j,i]<- phase2[j,i]}
-  }
-}
-for (i in 1:ncol(phase2)){
-  for (j in 1:nrow(phase2)){
-    if (is.na(phase2[j,i])){phase2[j,i]<- phase1[j,i]}
-  }
-}
+ 
+ for (i in 1:ncol(phase1)){
+   for (j in 1:nrow(phase1)){
+     if (is.na(phase1[j,i])){phase1[j,i]<- phase2[j,i]}
+   }
+ }
+ for (i in 1:ncol(phase2)){
+   for (j in 1:nrow(phase2)){
+     if (is.na(phase2[j,i])){phase2[j,i]<- phase1[j,i]}
+   }
+ }
 
 phase1$phase <- c("ph1")
 phase2$phase <- c("ph2")
@@ -259,17 +256,17 @@ bristol8 <- metadata_diet %>%
   select(ID1_stn, bristol=bristol8, bristolcat=bristolcat8)
 
 ##### missing data ####
-for (i in 1:nrow(bristol5)){
-  if (is.na(bristol5[i,2])){bristol5[i,2]<- metadata_diet$bristol_avg[i]}
-  if (is.na(bristol6[i,2])){bristol6[i,2]<- metadata_diet$bristol_avg[i]}
-  if (is.na(bristol7[i,2])){bristol7[i,2]<- metadata_diet$bristol_avg[i]}
-  if (is.na(bristol8[i,2])){bristol8[i,2]<- metadata_diet$bristol_avg[i]}
-  
-  if (is.na(bristol5[i,3])){bristol5[i,3]<- metadata_diet$bristolcat_avg[i]}
-  if (is.na(bristol6[i,3])){bristol6[i,3]<- metadata_diet$bristolcat_avg[i]}
-  if (is.na(bristol7[i,3])){bristol7[i,3]<- metadata_diet$bristolcat_avg[i]}
-  if (is.na(bristol8[i,3])){bristol8[i,3]<- metadata_diet$bristolcat_avg[i]}
-}
+# for (i in 1:nrow(bristol5)){
+#   if (is.na(bristol5[i,2])){bristol5[i,2]<- metadata_diet$bristol_avg[i]}
+#   if (is.na(bristol6[i,2])){bristol6[i,2]<- metadata_diet$bristol_avg[i]}
+#   if (is.na(bristol7[i,2])){bristol7[i,2]<- metadata_diet$bristol_avg[i]}
+#   if (is.na(bristol8[i,2])){bristol8[i,2]<- metadata_diet$bristol_avg[i]}
+#   
+#   if (is.na(bristol5[i,3])){bristol5[i,3]<- metadata_diet$bristolcat_avg[i]}
+#   if (is.na(bristol6[i,3])){bristol6[i,3]<- metadata_diet$bristolcat_avg[i]}
+#   if (is.na(bristol7[i,3])){bristol7[i,3]<- metadata_diet$bristolcat_avg[i]}
+#   if (is.na(bristol8[i,3])){bristol8[i,3]<- metadata_diet$bristolcat_avg[i]}
+# }
 
 bristol <- rbind(bristol5, bristol6, bristol7, bristol8)
 metadata_db <- left_join(metadata_diet, bristol, by='ID1_stn')
@@ -307,8 +304,7 @@ basic <-   c('ID1_stn', 'ID1', 'phase',
            'agemlvs', 'bmi10', 'bmi12', 'wt10', 'wt12', 'smoke10', 'smk12', 'ncig12', 'bmic10', 'bmic12', 'bmi12cat', 'smoke12', 
            'calor10n', 'alco10n', 'calor10v', 
            'calor_avg', 'alco_avg', 'abx_avg', 'probx_avg', 'alc_avg', 'bristol', 'bristolcat', 'bristol_avg', 'bristolcat_avg',
-           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr', 'calor_fs_dr_ddr', 
-           'tfat_avg')
+           'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr', 'calor_fs_dr_ddr'  )
 
 # smoke12 is ordinal
 exposure_long <- c('ala10v', 'epa10v', 'dha10v', 'trans10v', 'omega610v', 'omega3_noala10a', 'dpa10v', 'omega310v', 'omega3_noala10v')
@@ -331,13 +327,6 @@ outcome_pfa <- c('ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa',
 outcome_logpfa <- c('logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 
                     'logAA_pfa' = 'logP8', 
                     'logomega3_pfa','logomega3_noala_pfa','logomega6_pfa')
-fat <- c( 'fat_ddr' = 'a_fat_fs_dr_ddr',
-          'epa_ddr' = 'a_f205_fs_dr_ddr',
-          'dha_ddr' = 'a_f226_fs_dr_ddr',
-          'dpa_ddr' = 'a_p22_5_fs_dr_ddr',
-          'omega3_noala_ddr' = 'a_omega3_noala_fs_dr_ddr',
-          'omega3_ddr' = 'a_omega3_fs_dr_ddr',
-          'fat' = 'a_fat_fs_dr_ddr')
 
 metadata_intrst <- metadata_dbp %>%
   select(basic, exposure_long, exposure_avg, exposure_1yr, exposure_short,
@@ -346,16 +335,17 @@ metadata_intrst <- metadata_dbp %>%
 
 
 ###3) Missing data ####
-median <- metadata_intrst %>% 
-  dplyr::summarise(across(everything(), ~ median(.x, na.rm=T))) 
-
-for (i in 1:ncol(metadata_intrst)){
-  for( j in 1:nrow(metadata_intrst)){
-    if(is.na(metadata_intrst[j,i])){metadata_intrst[j,i]<- median[1,i]}
-  }
-}
+# median <- metadata_intrst %>% 
+#   dplyr::summarise(across(everything(), ~ mean(.x, na.rm=T))) 
+# 
+# for (i in 1:ncol(metadata_intrst)){
+#   for( j in 1:nrow(metadata_intrst)){
+#     if(is.na(metadata_intrst[j,i])){metadata_intrst[j,i]<- median[1,i]}
+#   }
+# }
 
 #metadata_intrst <- tibble::column_to_rownames(metadata_intrst, var = "ID1_stn")
+
 
 #### Make log ######
 for_log <- metadata_intrst
@@ -414,7 +404,12 @@ for (i in 1:ncol(bispecies)){
 
 
 ###DONE!!!!!!!!!!!!!!!!!!
-
+missing1 <- is.na(metadata_intrst[,c('logcrp_plasma', 'omega3_noala_ddr', 'epa_ddr', 'dpa_ddr', 'dha_ddr',
+                             'omega3_noala_ffq', 'epa_ffq', 'dpa_ffq', 'dha_ffq',
+                             'omega3_noala10v', 'epa10v', 'dpa10v', 'dha10v'
+                             ) ])
+colSums(missing1)
+sum(rowSums(missing1)!=0)
 
 
 
@@ -440,19 +435,9 @@ meta_stn <- read.table('./data/meta_stn.pcl',row.names = 1, header=TRUE, sep='\t
 logmeta_stn <- read.table('./data/logmeta_stn.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
 
 
-####TOP 20
 
-order_species <- species [,rev(order(colSums(species)))]
-top20 <- colnames(order_species[,1:20])
-top50 <- colnames(order_species[,1:50])
-order_species[,1:20]
+reg <- lmer(data = metadata_intrst, logcrp_plasma ~ omega3_noala_ffq + (1|ID1))
 
 
+anova(reg)
 
-order_species2 <- species [,order(col_count(species, count = 0, append = F))]
-frq20 <- colnames(order_species2[,1:20])
-frq50 <- colnames(order_species2[,1:50])
-
-
-
-a50 <- data.frame(top50=top50, frq50=frq50)
