@@ -111,9 +111,6 @@ species_filt <- all_species_filt[,!colnames(all_species_filt) %in% c('ID1','stn'
 write.table(species_filt, file = "./data/species_filt.csv", sep = ",", col.names = TRUE, row.names = TRUE)
 
 
-meta_id$tfat_avg
-
-
 
 
 
@@ -123,10 +120,12 @@ meta_id$tfat_avg
 
 #### + Import Metadata by individual #####
 meta_id <- read.table("data/mlvs_exposure_for_jorick.txt", header=TRUE, sep='\t', check.names=TRUE, quote ="")
+meta_id <- read.table("data/mlvs_exposure_for_Sunjeong.txt", header=TRUE, sep='\t', check.names=TRUE, quote ="")
+meta_id$wtchg <- meta_id$wt_paq2-meta_id$wt_paq1
 idkey <- read.csv('data/idkey.csv', header=TRUE, sep = ",", stringsAsFactors = FALSE)
 rownames(idkey) <- idkey$id
 meta_id<- left_join(idkey, meta_id, by="id")
-
+hist(meta_id$wtchg)
 
 #### + set Phase #####
 #+ ph0 : long term
@@ -137,11 +136,12 @@ meta_id<- left_join(idkey, meta_id, by="id")
 colnames(meta_id) <- gsub("w1avg","w1", colnames(meta_id)) 
 colnames(meta_id) <- gsub("w2avg","w2", colnames(meta_id))
 
-phase1 <- meta_id %>% select(ID1, contains('_w1'), contains('ffq1'), contains('plasma1'), contains('qu1'))
-phase2 <- meta_id %>% select(ID1, contains('_w2'), contains('ffq2'), contains('plasma2'), contains('qu2'))
 
-colnames(phase1) <- str_replace_all(colnames(phase1),  c("_w1" = "_ddr", "ffq1" = "ffq", "plasma1" = "plasma", "qu1" = "qu"))
-colnames(phase2) <- str_replace_all(colnames(phase2),  c("_w2" = "_ddr", "ffq2" = "ffq", "plasma2" = "plasma", "qu2" = "qu"))
+phase1 <- meta_id %>% select(ID1, contains('_w1'), contains('ffq1'), contains('plasma1'), contains('qu1'), contains('wt_paq1'))
+phase2 <- meta_id %>% select(ID1, contains('_w2'), contains('ffq2'), contains('plasma2'), contains('qu2'), contains('wt_paq2'))
+
+colnames(phase1) <- str_replace_all(colnames(phase1),  c("_w1" = "_ddr", "ffq1" = "ffq", "plasma1" = "plasma", "qu1" = "qu", "paq1"="paq"))
+colnames(phase2) <- str_replace_all(colnames(phase2),  c("_w2" = "_ddr", "ffq2" = "ffq", "plasma2" = "plasma", "qu2" = "qu", "paq2"="paq"))
 
 ##### missing data ####
 dim(phase1)==dim(phase2)
@@ -290,7 +290,10 @@ pfa <- pfa %>%
   mutate(ID1 = as.integer(substr(pfa$ID, 1, 6)))%>%
   mutate(omega3_pfa = ala_pfa+ epa_pfa+ dpa_pfa+ dha_pfa,
          omega3_noala_pfa= epa_pfa+ dpa_pfa+ dha_pfa,
-         omega6_pfa = P1+P2+P5+ P6+ P8+P9+P12)
+         omega6_pfa = P1+P2+P5+ P6+ P8+P9+P12,
+         sat_pfa = Sa+Sb+S1+Sc+S2+S3+S4+S5+S6+S7+S8+S10+S11+S12,
+         monounsat_pfa = M1+M2+M3+M6+M7+M10+M12,
+         trans_pfa = T1+T2+T3+T4+T5+T6+T7+T8+T10)
 
 
 #get first 6 number of ID1 which stands for id in idkey file
@@ -304,20 +307,22 @@ metadata_dbp$calor_fs_dr_ddr
 
 ### 4) metadata of interest ####
 basic <-   c('ID1_stn', 'ID1', 'phase',
-           'agemlvs', 'bmi10', 'bmi12', 'wt10', 'wt12', 'smoke10', 'smk12', 'ncig12', 'bmic10', 'bmic12', 'bmi12cat', 'smoke12', 
+           'agemlvs', 'bmi10', 'bmi12', 'wt10', 'wt12', 'smoke10', 'smk12', 'ncig12', 'bmic10', 'bmic12', 'bmi12cat', 'smoke12',
+           'wt_paq', 'height_paq1', 'bmi_paq1', 'waist_paq1', 'hip_paq1', 'whr_paq1', 'wtchg',
            'calor10n', 'alco10n', 'calor10v', 
            'calor_avg', 'alco_avg', 'abx_avg', 'probx_avg', 'alc_avg', 'bristol', 'bristolcat', 'bristol_avg', 'bristolcat_avg',
            'a_alco_fo_dr_ddr', 'abx_ddr', 'probx_ddr', 'bristol_ddr', 'bristolcat_ddr', 'calor_fs_dr_ddr', 
            'tfat_avg')
 
+
 # smoke12 is ordinal
 exposure_long <- c('ala10v', 'epa10v', 'dha10v', 'trans10v', 'omega610v', 'omega3_noala10a', 'dpa10v', 'omega310v', 'omega3_noala10v')
 exposure_avg <- c('ala_avg', 'epa_avg', 'dpa_avg', 'trans_avg', 'omega3_avg', 'omega6_avg', 'omega3_noala_avg', 'fishavg')
-exposure_short <- c( 'ala_ddr' = 'a_ala_fs_dr_ddr',
+exposure_short <- c( #'ala_ddr' = 'a_ala_fs_dr_ddr',
                      'epa_ddr' = 'a_f205_fs_dr_ddr',
                      'dha_ddr' = 'a_f226_fs_dr_ddr',
                      'dpa_ddr' = 'a_p22_5_fs_dr_ddr',
-                     'omega3_noala_ddr' = 'a_omega3_noala_fs_dr_ddr',
+                     #'omega3_noala_ddr' = 'a_omega3_noala_fs_dr_ddr',
                      'omega3_ddr' = 'a_omega3_fs_dr_ddr',
                         'fat' = 'a_fat_fs_dr_ddr')
 
@@ -327,7 +332,8 @@ outcome_plasma <- c('folate_plasma', 'tc_plasma', 'hdlc_plasma', 'tg_plasma', 'c
             'logtchdl_plasma', 'logcrp_plasma', 'logtc_plasma', 'loghdl_plasma', 'logtg_plasma')
 outcome_pfa <- c('ala_pfa', 'epa_pfa', 'dpa_pfa', 'dha_pfa', 
                 'AA_pfa' = 'P8', 
-                'omega3_pfa','omega3_noala_pfa','omega6_pfa')
+                'omega3_pfa','omega3_noala_pfa','omega6_pfa', 
+                'sat_pfa', 'monounsat_pfa', 'trans_pfa')
 outcome_logpfa <- c('logala_pfa', 'logepa_pfa', 'logdpa_pfa', 'logdha_pfa', 
                     'logAA_pfa' = 'logP8', 
                     'logomega3_pfa','logomega3_noala_pfa','logomega6_pfa')
@@ -445,8 +451,6 @@ logmeta_stn <- read.table('./data/logmeta_stn.pcl',row.names = 1, header=TRUE, s
 order_species <- species [,rev(order(colSums(species)))]
 top20 <- colnames(order_species[,1:20])
 top50 <- colnames(order_species[,1:50])
-order_species[,1:20]
-
 
 
 order_species2 <- species [,order(col_count(species, count = 0, append = F))]
@@ -456,3 +460,4 @@ frq50 <- colnames(order_species2[,1:50])
 
 
 a50 <- data.frame(top50=top50, frq50=frq50)
+

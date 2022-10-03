@@ -20,29 +20,38 @@ cor_data <- subset(meta_species,
 cor <- rcorr(as.matrix(cor_data ),type=c("spearman"))
 cor
 
-meta_species$'Age' <- meta_species$agemlvs
-meta_species$'BMI' <- meta_species$bmi12
-meta_species$'Calory_intake' <- meta_species$calor10v
-meta_species$'Plasma_CRP' <- meta_species$logcrp_w1
-meta_species$'Plasma_HDL' <- meta_species$loghdl_w1
-meta_species$'Plasma_TG' <- meta_species$logtg_w1
-
-list <- c('agemlvs', 'bmi12', 'logcrp_plasma',
-          'omega3_noala_ddr', 'epa_ddr', 'dpa_ddr', 'dha_ddr', 'ala_ddr', 'omega3_ddr',
-          'omega3_noala_ffq','epa_ffq', 'dpa_ffq', 'dha_ffq','ala_ffq','omega3_ffq',
-          'omega3_noala10v','epa10v', 'dpa10v', 'dha10v','ala10v','omega310v',
-          'omega3_noala_pfa','epa_pfa', 'dpa_pfa', 'dha_pfa', 'ala_pfa','omega3_pfa'
+list <- c('agemlvs', 'bmi12', 'logcrp_plasma','logAA_pfa',
+          'omega3_ddr', 
+          'omega3_ffq',
+          'omega310v',
+          #'omega3_pfa',
+          'omega3_noala_ddr',# 'epa_ddr', 'dpa_ddr', 'dha_ddr', 'ala_ddr', 'omega3_ddr',
+          'omega3_noala_ffq',#'epa_ffq', 'dpa_ffq', 'dha_ffq','ala_ffq','omega3_ffq',
+          'omega3_noala10v',#'epa10v', 'dpa10v', 'dha10v','ala10v','omega310v',
+          'omega3_noala_pfa','epa_pfa', 'dpa_pfa', 'dha_pfa', 'ala_pfa','omega3_pfa',
+          'omega6_pfa','sat_pfa', 'monounsat_pfa', 'trans_pfa'
 )
-
+list<- c('bmi_paq1', 'wt_paq1', 'waist_paq1', 'whr_paq1', 'wtchg',
+         'logcrp_plasma', 'hba1c')
 corrmat <- totmeta_stn[,c('agemlvs', 'bmi12', 
-                          'logcrp_plasma',
+                          'logcrp_plasma','logAA_pfa',
+                          'omega3_ddr',
+                          'omega3_ffq',
+                          'omega310v',
+                          'omega3_pfa',
                           'omega3_noala_ddr', #'epa_ddr', 'dpa_ddr', 'dha_ddr', 'ala_ddr', 'omega3_ddr',
                           'omega3_noala_ffq',#'epa_ffq', 'dpa_ffq', 'dha_ffq','ala_ffq','omega3_ffq',
                           'omega3_noala10v',#'epa10v', 'dpa10v', 'dha10v','ala10v','omega310v',
                           'omega3_noala_pfa')]#,'epa_pfa', 'dpa_pfa', 'dha_pfa', 'ala_pfa','omega3_pfa')]
-totmeta_stn$omega3noala_
 
-pawt_data <- subset(meta_species, select=list)
+
+corrmat <- totmeta_stn[,c('agemlvs', 'bmi12', 
+                          'logcrp_plasma','logAA_pfa',
+                          'omega3_pfa','omega6_pfa', 
+                          'sat_pfa', 'monounsat_pfa', 'trans_pfa')]
+
+
+
 
 cormat <- rcorr(as.matrix(corrmat),type=c("spearman"))
 
@@ -64,18 +73,44 @@ lower_tri$var1<-rownames(lower_tri)
 
 melted_cormat <- melt(lower_tri, id.vars='var1', na.rm = TRUE)
 melted_cormat
+
+
+
+
+pcx <- cormat
+str(pcx)
+df.pcx<-data.frame(pcx$P)
+df.pcx<-round(df.pcx,4)
+df.pcx
+
+# Get lower triangle of the correlation matrix
+get_lower_tri<-function(df.rcx){
+  df.rcx[lower.tri(df.rcx)] <- NA
+  return(df.rcx)
+}
+lower_tri_p <- get_lower_tri(df.pcx)
+lower_tri_p
+lower_tri_p$var1<-rownames(lower_tri_p)
+
+
+melted_cormat_p <- melt(lower_tri_p, id.vars='var1', na.rm = TRUE)
+melted_cormat_p$stars<-cut(as.numeric(melted_cormat_p$value), breaks=c(-Inf, 0.005, 0.01, 0.05, Inf), label=c("***","**", "*", ""))
+
+
+melted_rp<- left_join(melted_cormat, melted_cormat_p, by = c("var1", "variable"))
+
 # Heatmap
 
 level_x_order <- factor(melted_cormat$variable, level = rev(list))
 
 level_y_order <- factor(melted_cormat$var1, level = list)
 
-ggheatmap <- ggplot(melted_cormat, aes(level_x_order, level_y_order, fill = value))+
+ggplot(melted_rp, aes(level_x_order, level_y_order, fill = value.x))+
   geom_tile(color = "white")+
   scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
                        midpoint = 0, limit = c(-1,1), space = "Lab", 
                        name="Spearman\nCorrelation") +
-  geom_text(aes(label=value), color="black", size=4, show.legend = TRUE) +
+  geom_text(aes(label=stars), color="black", size=4, show.legend = TRUE) +
   theme_minimal()+ # minimal theme
   theme(legend.title = element_text(size = 10,color="black"),
         legend.text = element_text(size = 10,color="black"),

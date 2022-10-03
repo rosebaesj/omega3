@@ -34,10 +34,108 @@ logspecies <-read.table(file = './data/logspecies_filt.pcl', row.names = 1,  hea
 bispecies <- read.table('./data/bispecies_filt.pcl',row.names = 1, header=TRUE, sep='\t', check.names=TRUE, quote ="")
 
 
-meta_logspecies <- merge(totmeta_stn, logspecies, by = 0)
-meta_bispecies <- merge(totmeta_stn, bispecies, by = 0)
+meta_logspecies <- merge(meta_stn, logspecies, by = 0)
+meta_bispecies <- merge(meta_stn, bispecies, by = 0)
 
 a<- NULL
+
+
+meta_stn$omega3_noala_ddr
+
+#####
+
+
+list <- c('omega3_noala_ddr', 'epa_ddr', 'dpa_ddr', 'dha_ddr',# 'ala_ddr', 'omega3_ddr',
+          'omega3_noala_ffq','epa_ffq', 'dpa_ffq', 'dha_ffq',#'ala_ffq','omega3_ffq',
+          'omega3_noala10v','epa10v', 'dpa10v', 'dha10v',#'ala10v','omega310v',
+          'omega3_noala_pfa','epa_pfa', 'dpa_pfa', 'dha_pfa'#, 'ala_pfa','omega3_pfa'
+)
+
+
+corr <- NULL
+for (l in list){
+  crp<- cor.test(meta_stn$logcrp_plasma, meta_stn[,l], method = "spearman")
+  hdl<- cor.test(meta_stn$loghdl_plasma, meta_stn[,l], method = "spearman")
+  tc<- cor.test(meta_stn$logtc_plasma, meta_stn[,l], method = "spearman")
+  tg<- cor.test(meta_stn$logtg_plasma, meta_stn[,l], method = "spearman")
+  corr <- rbind(corr, 
+                c(exposure = l, outcome = "CRP", rho = crp$estimate, pval = crp$p.value),
+                c(exposure = l, outcome = "HDL", rho = hdl$estimate, pval = hdl$p.value),
+                c(exposure = l, outcome = "TC", rho = tc$estimate, pval = tc$p.value),
+                c(exposure = l, outcome = "TG", rho = tg$estimate, pval = tg$p.value)
+                )
+  
+}
+
+
+corr <- data.frame(corr)
+corr$exposure <- factor(corr$exposure, levels = list, order = T)
+corr$outcome <- factor(corr$outcome, levels = c('CRP', 'HDL', 'TC', 'TG'), order = T)
+corr$stars <- cut(as.numeric(corr$pval), breaks=c(-Inf, 0.01, 0.05, 0.10, Inf), label=c("***","**", "*", ""))
+
+ggplot(corr, aes(exposure, outcome)) +
+  geom_tile(aes(fill = as.numeric(rho.rho)), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+ # xlab("omega3 intake") +
+  labs(title = "Spearman correlation")+
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+
+
+## THE END #####
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### 1. logcrp ~ ddr ####
 
 
@@ -423,7 +521,7 @@ ggplot(corr, aes(data, omega3)) +
   scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
   geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
   xlab("omega3 intake") +
-  labs(title = "Spearman correlation")+
+  labs(title = "Spearman correlation with CRP")+
   theme(legend.title = element_text(size = 10),
         legend.text = element_text(size = 10),
         legend.position = "right",
@@ -433,62 +531,6 @@ ggplot(corr, aes(data, omega3)) +
         axis.text.y=element_text(size=10, face="italic",color="black"),
         axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
   labs(fill = "Beta coefficient")
-
-
-
-
-#####
-
-
-list <- c('omega3_noala_ddr', 'epa_ddr', 'dpa_ddr', 'dha_ddr', 'ala_ddr', 'omega3_ddr',
-          'omega3_noala_ffq','epa_ffq', 'dpa_ffq', 'dha_ffq','ala_ffq','omega3_ffq',
-          'omega3_noala10v','epa10v', 'dpa10v', 'dha10v','ala10v','omega310v',
-          'omega3_noala_pfa','epa_pfa', 'dpa_pfa', 'dha_pfa', 'ala_pfa','omega3_pfa'
-)
-
-
-corr <- NULL
-for (l in list){
-  spearman<- cor.test(meta_bispecies$logcrp_plasma, meta_bispecies[,l], method = "spearman")
-  
-  corr <- rbind(corr, c(name = l, rho = spearman$estimate, pval = spearman$p.value))
-  
-}
-
-
-corr <- data.frame(corr)
-corr$name <- factor(corr$name, levels = rev(corr$name), order = T)
-corr$stars <- cut(as.numeric(corr$pval), breaks=c(-Inf, 0.01, 0.05, 0.10, Inf), label=c("***","**", "*", ""))
-corr$data <- factor(c('DDR','DDR','DDR','DDR','DDR','DDR',
-                      'FFQ','FFQ','FFQ','FFQ','FFQ','FFQ',
-                      '~2010','~2010','~2010','~2010','~2010','~2010',
-                      'pfa','pfa','pfa','pfa','pfa','pfa'),
-                    levels = c('DDR', 'FFQ', '~2010', 'pfa'), order = T)
-corr$omega3 <- factor(c('omega3_noala', 'epa', 'dpa', 'dha', 'ala', 'omega3',
-                        'omega3_noala', 'epa', 'dpa', 'dha', 'ala', 'omega3',
-                        'omega3_noala', 'epa', 'dpa', 'dha', 'ala', 'omega3',
-                        'omega3_noala', 'epa', 'dpa', 'dha', 'ala', 'omega3'),
-                      levels = rev(c('omega3_noala', 'epa', 'dpa', 'dha', 'ala', 'omega3')),
-                      order = T)
-
-
-
-ggplot(corr, aes(data, omega3)) +
-  geom_tile(aes(fill = as.numeric(rho.rho)), color = "white") +
-  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
-  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
-  xlab("omega3 intake") +
-  labs(title = "Spearman correlation")+
-  theme(legend.title = element_text(size = 10),
-        legend.text = element_text(size = 10),
-        legend.position = "right",
-        plot.title = element_text(size=10),
-        axis.title.x=element_text(size=10,color="black"),
-        axis.title.y= element_blank(),
-        axis.text.y=element_text(size=10, face="italic",color="black"),
-        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
-  labs(fill = "Beta coefficient")
-
 
 
 

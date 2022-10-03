@@ -44,7 +44,7 @@ maaslin_diet_ddr<-function(exposure){
 }
 
 
-maaslin_diet_ddr(exposure = 'omega310v')
+maaslin_diet_ddr(exposure = 'wtchg')
 maaslin_diet_ddr(exposure = 'logomega310v')
 
 for (e in exposure_long){
@@ -73,6 +73,18 @@ for (e in outcome_pfa){
   maaslin_diet_ddr(exposure = e)
 }
 
+fatty_acid <- c('sat_pfa',
+                'omega6_pfa','sat_pfa', 'monounsat_pfa', 'trans_pfa')
+for (e in fatty_acid){
+  maaslin_diet_ddr(exposure = e)
+}
+
+obesity <- c( 'wt_paq', 'height_paq1', 'bmi_paq1', 'waist_paq1', 'hip_paq1', 'whr_paq1', 'wtchg')
+for (e in obesity){
+  maaslin_diet_ddr(exposure = e)
+}
+
+maaslin_diet_ddr(exposure = 'wtchg')
 ### log it
 
 logall <- c(exposure_long, exposure_short, exposure_1yr, exposure_avg, outcome_plasma, outcome_pfa)
@@ -88,6 +100,8 @@ for (e in logall){
 
 ##### maaslin of pfa adjusted by ddr #####
 adjust <- c('ala', 'epa', 'dpa', 'dha','omega3','omega3_noala','omega6')
+adjust <- c('omega3',
+                'omega6','trans_pfa')
 
 maaslin_adjust<-function(adjust){
   dir = paste('./maaslin_results/adjusted_', adjust, '.pcl',sep='')

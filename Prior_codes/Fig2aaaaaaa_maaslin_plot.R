@@ -132,7 +132,9 @@ plot_maaslin <- function(listofmeta, by = by){
   return (bind)
 }
 
-
+exposures <-  c(
+  'bmi_paq1', 'whr_paq1', 'waist_paq1', 'wt_paq', 'wtchg', 
+  'logcrp_plasma', 'loghdlc_plasma', 'logtg_plasma', 'logtc_plasma')
 
 ### A) exposures ####
 bind_exp <- plot_maaslin(exposures, by = 'omega3_ddr')
@@ -293,6 +295,52 @@ ggplot(bind_list, aes(meta, name))+
         axis.title=element_text(size=10,face="bold",colour="white"),
         axis.text.x = element_text(angle = 45, hjust = 1, size=10,colour="white")) +
   labs(fill = "Phyla")
+
+
+
+
+
+
+
+
+### A) exposures ####
+exposures <- c('bmi10', 'wtchg', 'waist_paq1', 'waist'
+               'logcrp_plasma', #'omega3_avg', 'omega6_avg',  'trans_avg', 
+               'tfat_avg', 
+               'omega3_pfa', 'omega6_pfa','sat_pfa', 'monounsat_pfa', 'trans_pfa' )
+
+exposures <- c('bmi10', 'wt_paq', #'height_paq1', 
+               'bmi_paq1', 'waist_paq1', #'hip_paq1', 
+               'whr_paq1', 'wtchg')
+getwd()
+
+
+bind_exp <- plot_maaslin(exposures, by = 'omega3_ddr')
+
+ggplot(bind_exp, aes(meta, name)) +
+  geom_tile(aes(fill = coef), color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", space = "Lab" ) +
+  geom_text(aes(label=stars), color="black", size=3, show.legend = TRUE) +
+  xlab("omega3 intake") +
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 10),
+        legend.position = "left",
+        plot.title = element_text(size=10),
+        axis.title.x=element_text(size=10,color="black"),
+        axis.title.y= element_blank(),
+        axis.text.y=element_text(size=10, face="italic",color="black"),
+        axis.text.x = element_text(angle = 45, hjust = 1, size=10,color="black")) +
+  labs(fill = "Beta coefficient")
+
+
+ggplot(data = NULL, aes(species$s__Eubacterium_rectale, totmeta_stn$dpa_ddr))+
+  geom_point()
+
+
+
+
+
+
 
 
 
